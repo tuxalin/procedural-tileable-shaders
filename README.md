@@ -1,4 +1,4 @@
-# procedural-tileable-shaders
+# Tileable procedural textures
 Collection of tileable procedural textures:
 - celullar noise
 - metaballs (variant of cellular noise)
@@ -15,11 +15,11 @@ Collection of tileable procedural textures:
 ## Contributing
 
 Based on:
-- [filtering the checkerboard pattern by Inigo Quilez](https://www.iquilezles.org/www/articles/checkerfiltering/checkerfiltering.htm).
-- [voronoi edges by Inigo Quilez](https://www.iquilezles.org/www/articles/voronoilines/voronoilines.htm)
-- [Perlin noise by Stefan Gustavson]
+- [Filtering the checkerboard pattern by Inigo Quilez](https://www.iquilezles.org/www/articles/checkerfiltering/checkerfiltering.htm).
+- [Voronoi edges by Inigo Quilez](https://www.iquilezles.org/www/articles/voronoilines/voronoilines.htm).
+- Perlin noise by Stefan Gustavson.
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/tuxalin/water-shader.
+Bug reports and pull requests are welcome on GitHub at https://github.com/tuxalin/procedural-tileable-shaders.
 
 ## License
 
