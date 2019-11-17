@@ -4,8 +4,9 @@ Collection of tileable procedural textures:
 - metaballs (variant of cellular noise)
 - checkers (diagonal)
 - voronoi (edges, cells)
-- perlin noise
 - value noise
+- gradient noise
+- perlin noise
 - fbm
 
 ## Preview
