@@ -1,13 +1,14 @@
-float voronoi(const in vec2 pos, const in vec2 scale, const in float jitter, out vec2 tilePos, out vec2 relativePos)
+vec3 voronoi(const in vec2 pos, const in vec2 scale, const in float jitter, out vec2 tilePos)
 {
-    // voronoi based on Inigo Quilez implementation
+    // voronoi based on Inigo Quilez
     vec2 p = pos * floor(scale);
     vec2 i = floor(p);
     vec2 f = fract(p);
 
     // first pass
     vec2 minPos;
-    float minDistance = 1e+5;
+    float F1 = 1e+5;
+    float F2 = 1e+5;
     for (int y=-1; y<=1; y++)
     {
         for (int x=-1; x<=1; x++)
@@ -17,18 +18,23 @@ float voronoi(const in vec2 pos, const in vec2 scale, const in float jitter, out
             vec2 rPos = n + cPos - f;
 
             float d = dot(rPos, rPos);
-            if(d < minDistance)
+            if(d < F1)
             {
-                minDistance = d;
+                F2 = F1;
+                F1 = d;
+                
                 minPos = rPos;
                 tilePos = cPos;
             }
+            else if(d < F2) 
+            {
+                F2 = d;
+            }
         }
     }
-    relativePos = minPos;
 
     // second pass, distance to borders
-    minDistance = 1e+5;
+    float minDistance = 1e+5;
     for (int y=-2; y<=2; y++)
     {
         for (int x=-2; x<=2; x++)
@@ -43,5 +49,5 @@ float voronoi(const in vec2 pos, const in vec2 scale, const in float jitter, out
         }
     }
 
-    return minDistance;
+    return vec3(minDistance, F1, F2);
 }
