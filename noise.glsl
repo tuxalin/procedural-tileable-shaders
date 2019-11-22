@@ -14,6 +14,23 @@ float noise(const in vec2 pos, const in vec2 scale)
     return mix(a, b, u.x) + (c - a) * u.y * (1.0 - u.x) + (d - b) * u.x * u.y;
 }
 
+// @note position must be premultiplied with the scale
+float noise(const in vec2 pos, const in vec2 scale, const in mat2 rotation) 
+{
+     // classic value noise with rotation
+    vec2 p = mod(pos, scale);
+    vec2 i = floor(p);
+    vec2 f = fract(p);
+
+    float a = hash(rotation * i);
+    float b = hash(rotation * mod(i + vec2(1.0, 0.0), scale));
+    float c = hash(rotation * mod(i + vec2(0.0, 1.0), scale));
+    float d = hash(rotation * mod(i + vec2(1.0, 1.0), scale));
+
+    vec2 u = f * f * (3.0 - 2.0 * f);
+    return mix(a, b, u.x) + (c - a) * u.y * (1.0 - u.x) + (d - b) * u.x * u.y;
+}
+
 float gradientNoise(const in vec2 pos, const in vec2 scale) 
 {
     // classic gradient noise

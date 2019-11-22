@@ -1,9 +1,9 @@
-vec3 voronoi(const in vec2 pos, const in vec2 scale, const in float jitter, out vec2 tilePos)
+// @note position must be premultiplied with the scale
+vec3 voronoi(const in vec2 pos, const in vec2 scale, const in float jitter, const in mat2 rotation, out vec2 tilePos)
 {
     // voronoi based on Inigo Quilez
-    vec2 p = pos * floor(scale);
-    vec2 i = floor(p);
-    vec2 f = fract(p);
+    vec2 i = floor(pos);
+    vec2 f = fract(pos);
 
     // first pass
     vec2 minPos;
@@ -14,7 +14,7 @@ vec3 voronoi(const in vec2 pos, const in vec2 scale, const in float jitter, out 
         for (int x=-1; x<=1; x++)
         {
             vec2 n = vec2(float(x), float(y));
-            vec2 cPos = hash2d(mod(i + n, scale)) * jitter;
+            vec2 cPos = rotation * hash2d(mod(i + n, scale)) * jitter;
             vec2 rPos = n + cPos - f;
 
             float d = dot(rPos, rPos);
@@ -40,7 +40,7 @@ vec3 voronoi(const in vec2 pos, const in vec2 scale, const in float jitter, out 
         for (int x=-2; x<=2; x++)
         { 
             vec2 n = vec2(float(x), float(y));
-            vec2 cPos = hash2d(mod(i + n, scale)) * jitter;
+            vec2 cPos = rotation * hash2d(mod(i + n, scale)) * jitter;
             vec2 rPos = n + cPos - f;
             
             vec2 v = minPos - rPos;
@@ -50,4 +50,10 @@ vec3 voronoi(const in vec2 pos, const in vec2 scale, const in float jitter, out 
     }
 
     return vec3(minDistance, F1, F2);
+}
+
+vec3 voronoi(const in vec2 pos, const in vec2 scale, const in float jitter, out vec2 tilePos)
+{
+    mat2 identity = mat2(1.0, 0.0, 0.0, 1.0);
+    return voronoi(pos * scale, scale, jitter, identity, tilePos);
 }
