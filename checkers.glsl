@@ -1,8 +1,9 @@
-vec3 checkers45(const in vec2 pos, const in vec2 scale, const in vec2 smoothness)
+vec3 checkers(const in vec2 pos, const in vec2 scale, const in vec2 smoothness)
 {
     // based on filtering the checkerboard by Inigo Quilez 
-    vec2 p = pos * floor(scale) * 2.0;
-    vec2 tile = floor(p);
+    vec2 numTiles = floor(scale); 
+    vec2 p = pos * numTiles * 2.0;
+    vec2 tile = mod(floor(p), numTiles);
     
     vec2 w = smoothness;
     // box filter using triangular signal
@@ -16,8 +17,8 @@ vec3 checkers45(const in vec2 pos, const in vec2 scale, const in vec2 smoothness
 vec3 checkers45(const in vec2 pos, const in vec2 scale, const in vec2 smoothness)
 {
     // based on filtering the checkerboard by Inigo Quilez 
-    vec2 p = pos * floor(scale) * 2.0;
-    vec2 tile = floor(p);
+    vec2 numTiles = floor(scale); 
+    vec2 p = pos * numTiles * 2.0;
     
     const float angle = 3.14152 / 4.0;
     const float cosAngle = cos(angle);
@@ -25,7 +26,7 @@ vec3 checkers45(const in vec2 pos, const in vec2 scale, const in vec2 smoothness
 
     p *= 1.0 / sqrt(2.0);
     p = p * mat2(cosAngle, sinAngle, -sinAngle, cosAngle);
-    tile = mod(floor(p), scale);
+    vec2 tile = mod(floor(p), numTiles);
     
     vec2 w = smoothness;
     // box filter using triangular signal
