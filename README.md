@@ -1,13 +1,13 @@
 # Tileable procedural textures
 Collection of tileable procedural textures:
+- value noise (with derivatives and rotation)
+- gradient noise
+- perlin noise (with rotation)
+- checkers (diagonal)
 - celullar noise
 - metaballs (variant of cellular noise)
-- checkers (diagonal)
 - voronoi (edges, cells)
-- value noise
-- gradient noise
-- perlin noise
-- fbm
+- fbm (value, perlin, voronoi and derivative)
 
 ## Preview
 
@@ -17,6 +17,7 @@ Collection of tileable procedural textures:
 
 Based on:
 - [Filtering the checkerboard pattern by Inigo Quilez](https://www.iquilezles.org/www/articles/checkerfiltering/checkerfiltering.htm).
+- [Value noise derivatives by Inigo Quilez](https://www.iquilezles.org/www/articles/morenoise/morenoise.htm).
 - [Voronoi edges by Inigo Quilez](https://www.iquilezles.org/www/articles/voronoilines/voronoilines.htm).
 - Perlin noise by Stefan Gustavson.
 
