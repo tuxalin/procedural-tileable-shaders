@@ -77,3 +77,28 @@ vec3 fbmPerlin(const in vec2 pos, const in vec2 scale, const int octaves, const 
     }
     return value;
 }
+
+float fbmd(const in vec2 pos, const in vec2 scale, const int octaves, const float shift, const in float gain, const in float lacunarity, const in float intensity) 
+{
+    // fbm implementation based on Inigo Quilez
+    float value = 0.0;
+    vec2 derivative = vec2(0.0);
+    float amplitude = 0.5;
+    vec2 frequency = floor(scale);
+    
+    mat2 rot = mat2(0.8,-0.6,0.6,0.8);
+    vec2 p = pos * frequency;
+    for (int i = 0; i < octaves; i++) 
+    {
+        vec3 n = noised(p, frequency, rot);
+        derivative += n.yz;
+        value += amplitude * n.x / (1.0 + mix(0.0, dot(derivative, derivative), intensity));
+        
+        p = p * lacunarity + shift;
+        frequency *= lacunarity;
+        amplitude *= gain;
+        
+        rot *= rot;
+    }
+    return value;
+}
