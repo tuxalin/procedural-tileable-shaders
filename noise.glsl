@@ -89,3 +89,24 @@ float perlinNoise(const in vec2 pos, const in vec2 scale)
     float n_xy = mix(n_x.x, n_x.y, fade_xy.y);
     return 2.0 * n_xy;
 }
+
+// @note position must be premultiplied with the scale
+float perlinNoise(const in vec2 pos, const in vec2 scale, const in mat2 rotation) 
+{
+    vec2 p = pos;
+    vec2 i = floor(p);
+    vec2 a = i;
+    vec2 b = i + vec2(1.0, 0.0);
+    vec2 c = i + vec2(0.0, 1.0);
+    vec2 d = i + vec2(1.0, 1.0);
+
+    vec2 g0 = rotation * hash2d(mod(a, scale));
+    vec2 g1 = rotation * hash2d(mod(b, scale));
+    vec2 g2 = rotation * hash2d(mod(c, scale));
+    vec2 g3 = rotation * hash2d(mod(d, scale));
+
+    vec2 u = smootherStep(p - i);
+    float ab = (1.0 - u.x) * dot(g0, (p - a)) + u.x * dot(g1, (p - b)); // upper points
+    float cd = (1.0 - u.x) * dot(g2, (p - c)) + u.x * dot(g3, (p - d)); // lower points
+    return 2.3 * mix(ab, cd, u.y);
+}
