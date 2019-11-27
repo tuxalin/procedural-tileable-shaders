@@ -23,10 +23,11 @@ float fbm(const in vec2 pos, const in vec2 scale, const int octaves, const float
     return value;
 }
 
-vec3 fbmVoronoi(const in vec2 pos, const in vec2 scale, const int octaves, const float shift, const float axialShift, const in float gain, const in float lacunarity, const in float jitter) 
+vec4 fbmVoronoi(const in vec2 pos, const in vec2 scale, const int octaves, const float shift, const float axialShift, const in float gain, const in float lacunarity, const in float jitter) 
 {
     // classic fbm implementation with voronoi
     vec3 value = vec3(0.0);
+    float lum = 0.0;
     float amplitude = 0.5;
     vec2 frequency = floor(scale);
     float angle = axialShift;
@@ -40,13 +41,14 @@ vec3 fbmVoronoi(const in vec2 pos, const in vec2 scale, const int octaves, const
         
         vec2 tilePos;
         value += amplitude * voronoi(p, frequency, jitter, rot, tilePos);
+        lum += amplitude * hash(tilePos);
         
         p = p * lacunarity + shift;
         frequency *= lacunarity;
         amplitude *= gain;
         angle += axialShift;
     }
-    return value;
+    return vec4(value, lum);
 }
 
 vec3 fbmPerlin(const in vec2 pos, const in vec2 scale, const int octaves, const float shift, const float axialShift, const in float gain, const in float lacunarity, const in bool isMultiplyMode, const in float factor, const in float intensity) 
