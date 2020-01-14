@@ -1,13 +1,14 @@
 # Tileable procedural textures
 Collection of tileable procedural textures:
-- value noise (with derivatives and rotation)
-- gradient noise
-- perlin noise (with rotation)
+- value noise (with derivatives and gradient rotation)
+- gradient noise (with derivatives)
+- perlin noise (with gradient rotation)
 - checkers (diagonal)
 - celullar noise
 - metaballs (variant of cellular noise)
 - voronoi (edges, cells)
 - fbm (value, perlin, voronoi and derivative)
+- domain warping (fbnm and gradient curl)
 
 ## Preview
 

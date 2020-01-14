@@ -35,5 +35,5 @@ float curlWarp(const in vec2 pos, const in vec2 scale, const vec2 factors, const
     n = gradientNoised(np + hash2d(seeds.z), scale).zy * curlFactor;
     r.y = n.x + n.y;
 
-    return gradientNoise(p + r * rfactor + hash2d(seeds.w), scale);
+    return gradientNoise(pos + r * rfactor + hash2d(seeds.w), scale);
 }
