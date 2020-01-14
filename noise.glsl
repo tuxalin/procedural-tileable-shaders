@@ -1,6 +1,7 @@
-float noise(const in vec2 pos, const in vec2 scale) 
+float noise(const in vec2 pos, vec2 scale) 
 {
     // classic value noise
+    scale = floor(scale);
     vec2 p = mod(pos * floor(scale), scale);
     vec2 i = floor(p);
     vec2 f = fract(p);
@@ -15,9 +16,10 @@ float noise(const in vec2 pos, const in vec2 scale)
 }
 
 // @note position must be premultiplied with the scale
-float noise(const in vec2 pos, const in vec2 scale, const in mat2 rotation) 
+float noise(const in vec2 pos, vec2 scale, const in mat2 rotation) 
 {
      // classic value noise with rotation
+    scale = floor(scale);
     vec2 p = mod(pos, scale);
     vec2 i = floor(p);
     vec2 f = fract(p);
@@ -31,10 +33,11 @@ float noise(const in vec2 pos, const in vec2 scale, const in mat2 rotation)
     return mix(a, b, u.x) + (c - a) * u.y * (1.0 - u.x) + (d - b) * u.x * u.y;
 }
 
-vec3 noised(const in vec2 pos, const in vec2 scale) 
+vec3 noised(const in vec2 pos, vec2 scale) 
 {
     // value noise with derivative based on Inigo Quilez
-    vec2 p = mod(pos * floor(scale), scale);
+    scale = floor(scale);
+    vec2 p = mod(pos * scale, scale);
     vec2 i = floor(p);
     vec2 f = fract(p);
     
@@ -54,9 +57,10 @@ vec3 noised(const in vec2 pos, const in vec2 scale)
 }
 
 // @note position must be premultiplied with the scale
-vec3 noised(const in vec2 pos, const in vec2 scale, const in mat2 rotation) 
+vec3 noised(const in vec2 pos, vec2 scale, const in mat2 rotation) 
 {
     // value noise with derivative based on Inigo Quilez
+    scale = floor(scale);
     vec2 p = mod(pos, scale);
     vec2 i = floor(p);
     vec2 f = fract(p);
@@ -76,10 +80,11 @@ vec3 noised(const in vec2 pos, const in vec2 scale, const in mat2 rotation)
     return vec3(value, derivative);
 }
 
-float gradientNoise(const in vec2 pos, const in vec2 scale) 
+float gradientNoise(const in vec2 pos, vec2 scale) 
 {
     // classic gradient noise
-    vec2 p = mod(pos * floor(scale), scale);
+    scale = floor(scale);
+    vec2 p = mod(pos * scale, scale);
     vec2 i = floor(p);
     vec2 f = fract(p);
     
@@ -136,8 +141,9 @@ float perlinNoise(const in vec2 pos, const in vec2 scale)
 }
 
 // @note position must be premultiplied with the scale
-float perlinNoise(const in vec2 pos, const in vec2 scale, const in mat2 rotation) 
+float perlinNoise(const in vec2 pos, vec2 scale, const in mat2 rotation) 
 {
+    scale = floor(scale);
     vec2 p = pos;
     vec2 i = floor(p);
     vec2 a = i;

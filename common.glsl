@@ -8,6 +8,13 @@ float hash(const in vec2 x)
     return fract(sin(dot(x, vec2(12.9898, 4.1414))) * 43758.5453); 
 }
 
+vec2 hash2d(const in float x)
+{
+    vec2 q = vec2(dot(vec2(x),vec2(127.1,311.7)), 
+                  dot(vec2(x),vec2(269.5,183.3)));
+    return fract(sin(q)*43758.5453);
+}
+
 vec2 hash2d(const in vec2 x)
 {
     vec2 q = vec2(dot(x,vec2(127.1,311.7)), 
