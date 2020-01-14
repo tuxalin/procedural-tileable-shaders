@@ -61,3 +61,10 @@ float perlinNoise(const in vec2 pos, vec2 scale, const in mat2 rotation)
     float cd = (1.0 - u.x) * dot(g2, (p - c)) + u.x * dot(g3, (p - d)); // lower points
     return 2.3 * mix(ab, cd, u.y);
 }
+
+float perlinNoise(const in vec2 pos, vec2 scale, const in float rotation) 
+{
+    float sinR = sin(rotation);
+    float cosR = cos(rotation);
+    return perlinNoise(pos, scale, mat2(cosR, sinR, sinR, cosR));
+}

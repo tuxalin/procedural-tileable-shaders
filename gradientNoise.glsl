@@ -17,6 +17,33 @@ float gradientNoise(const in vec2 pos, vec2 scale)
     return 2.0 * mix(ab, cd, u.y);
 }
 
+// @note position must be premultiplied with the scale
+float gradientNoise(const in vec2 pos, vec2 scale, const in mat2 rotation) 
+{
+    // classic gradient noise
+    scale = floor(scale);
+    vec2 p = mod(pos, scale);
+    vec2 i = floor(p);
+    vec2 f = fract(p);
+    
+    vec2 a = rotation * hash2d(i);
+    vec2 b = rotation * hash2d(mod(i + vec2(1.0, 0.0), scale));
+    vec2 c = rotation * hash2d(mod(i + vec2(0.0, 1.0), scale));
+    vec2 d = rotation * hash2d(mod(i + vec2(1.0, 1.0), scale));
+    
+    vec2 u = f * f * (3.0 - 2.0 * f);
+    float ab = mix(dot(a, f - vec2(0.0, 0.0)), dot(b, f - vec2(1.0, 0.0)), u.x);
+    float cd = mix(dot(c, f - vec2(0.0, 1.0)), dot(d, f - vec2(1.0, 1.0)), u.x);
+    return 2.0 * mix(ab, cd, u.y);
+}
+
+float gradientNoise(const in vec2 pos, vec2 scale, const in float rotation) 
+{
+    float sinR = sin(rotation);
+    float cosR = cos(rotation);
+    return gradientNoise(pos, scale, mat2(cosR, sinR, sinR, cosR));
+}
+
 vec3 gradientNoised(const in vec2 pos, vec2 scale)
 {
     // classic gradient noise with derivatives based on Inigo Quilez
