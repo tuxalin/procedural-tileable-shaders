@@ -1,4 +1,4 @@
-vec3 checkers(const in vec2 pos, const in vec2 scale, const in vec2 smoothness)
+vec3 checkerboard(const in vec2 pos, const in vec2 scale, const in vec2 smoothness)
 {
     // based on filtering the checkerboard by Inigo Quilez 
     vec2 numTiles = floor(scale); 
@@ -14,7 +14,7 @@ vec3 checkers(const in vec2 pos, const in vec2 scale, const in vec2 smoothness)
     return vec3(d, tile);
 }
 
-vec3 checkers45(const in vec2 pos, const in vec2 scale, const in vec2 smoothness)
+vec3 checkerboard45(const in vec2 pos, const in vec2 scale, const in vec2 smoothness)
 {
     // based on filtering the checkerboard by Inigo Quilez 
     vec2 numTiles = floor(scale); 
