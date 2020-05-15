@@ -2,7 +2,6 @@ float luma(const in vec4 color) { return dot(vec3(0.2558, 0.6511, 0.0931), color
 vec2 sobel(sampler2D tex, vec2 uv, float spread)
 {
     vec3 offset = vec3(1.0 / vec2(textureSize(tex, 0)), 0.0) * spread;
-
     vec2 grad = vec2(0.0);
     grad.x -= luma(texture(tex, uv - offset.xy)) * 1.0;
     grad.x -= luma(texture(tex, uv - offset.xz)) * 2.0;
@@ -21,20 +20,19 @@ vec2 sobel(sampler2D tex, vec2 uv, float spread)
 vec2 grayscaleSobel(sampler2D tex, vec2 uv, float spread)
 {
     vec3 offset = vec3(1.0 / vec2(textureSize(tex, 0)), 0.0) * spread;
-
     vec2 grad = vec2(0.0);
-    grad.x -= luma(texture(tex, uv - offset.xy)) * 1.0;
-    grad.x -= luma(texture(tex, uv - offset.xz)) * 2.0;
-    grad.x -= luma(texture(tex, uv + offset.xy * vec2(-1.0, 1.0))) * 1.0;
-    grad.x += luma(texture(tex, uv + offset.xy * vec2(1.0, -1.0))) * 1.0;
-    grad.x += luma(texture(tex, uv + offset.xz)) * 2.0;
-    grad.x += luma(texture(tex, uv + offset.xy)) * 1.0;
-    grad.y -= luma(texture(tex, uv - offset.xy)) * 1.0;
-    grad.y -= luma(texture(tex, uv - offset.zy)) * 2.0;
-    grad.y -= luma(texture(tex, uv + offset.xy * vec2(1.0, -1.0))) * 1.0;
-    grad.y += luma(texture(tex, uv + offset.xy * vec2(-1.0, 1.0))) * 1.0;
-    grad.y += luma(texture(tex, uv + offset.zy)) * 2.0;
-    grad.y += luma(texture(tex, uv + offset.xy)) * 1.0;
+    grad.x -= texture(tex, uv - offset.xy) * 1.0;
+    grad.x -= texture(tex, uv - offset.xz) * 2.0;
+    grad.x -= texture(tex, uv + offset.xy * vec2(-1.0, 1.0)) * 1.0;
+    grad.x += texture(tex, uv + offset.xy * vec2(1.0, -1.0)) * 1.0;
+    grad.x += texture(tex, uv + offset.xz) * 2.0;
+    grad.x += texture(tex, uv + offset.xy) * 1.0;
+    grad.y -= texture(tex, uv - offset.xy) * 1.0;
+    grad.y -= texture(tex, uv - offset.zy) * 2.0;
+    grad.y -= texture(tex, uv + offset.xy * vec2(1.0, -1.0)) * 1.0;
+    grad.y += texture(tex, uv + offset.xy * vec2(-1.0, 1.0)) * 1.0;
+    grad.y += texture(tex, uv + offset.zy) * 2.0;
+    grad.y += texture(tex, uv + offset.xy) * 1.0;
     return grad;
 }
 
