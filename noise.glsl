@@ -1,81 +1,190 @@
-float noise(const in vec2 pos, vec2 scale) 
+// 1D Value noise.
+// @param scale Number of tiles, must be an integer for tileable results, range: [2, inf]
+// @param seed Seed to randomize result, range: [0, inf]
+// @return Value of the noise, range: [-1, 1]
+float noise(float pos, float scale, float seed)
+{
+    pos *= scale;
+    vec2 i = floor(pos) + vec2(0.0, 1.0);
+    float f = pos - i.x;
+    i = mod(i, vec2(scale)) + seed;
+
+    float u = noiseInterpolate(f);
+    return mix(hash1D(i.x), hash1D(i.y), u) * 2.0 - 1.0;
+}
+
+// 2D Value noise.
+// @param scale Number of tiles, must be an integer for tileable results, range: [2, inf]
+// @param seed Seed to randomize result, range: [0, inf]
+// @return Value of the noise, range: [-1, 1]
+float noise(vec2 pos, vec2 scale, float seed) 
 {
     // classic value noise
-    scale = floor(scale);
-    vec2 p = mod(pos * floor(scale), scale);
-    vec2 i = floor(p);
-    vec2 f = fract(p);
+    pos *= scale;
+    vec4 i = floor(pos).xyxy + vec2(0.0, 1.0).xxyy;
+    vec2 f = pos - i.xy;
+    i = mod(i, scale.xyxy) + seed;
 
-    float a = hash(i);
-    float b = hash(mod(i + vec2(1.0, 0.0), scale));
-    float c = hash(mod(i + vec2(0.0, 1.0), scale));
-    float d = hash(mod(i + vec2(1.0, 1.0), scale));
+    vec4 hash = multiHash2D(i);
+    float a = hash.x;
+    float b = hash.y;
+    float c = hash.z;
+    float d = hash.w;
 
-    vec2 u = f * f * (3.0 - 2.0 * f);
-    return mix(a, b, u.x) + (c - a) * u.y * (1.0 - u.x) + (d - b) * u.x * u.y;
+    vec2 u = noiseInterpolate(f);
+    float value = mix(a, b, u.x) + (c - a) * u.y * (1.0 - u.x) + (d - b) * u.x * u.y;
+    return value * 2.0 - 1.0;
 }
 
-// @note position must be premultiplied with the scale
-float noise(const in vec2 pos, vec2 scale, const in mat2 rotation) 
+// 2D Value noise with time (or height) domain.
+// @param scale Number of tiles, must be an integer for tileable results, range: [2, inf]
+// @param time The height phase for the noise value, range: [0, inf], default: 0.0
+// @param seed Seed to randomize result, range: [0, inf], default: 0.0
+// @return Value of the noise, range: [-1, 1]
+float noise(vec2 pos, vec2 scale, float time, float seed)
 {
-     // classic value noise with rotation
-    scale = floor(scale);
-    vec2 p = mod(pos, scale);
-    vec2 i = floor(p);
-    vec2 f = fract(p);
+    // classic value noise with 3D
+    pos *= scale;
+    vec3 i = floor(vec3(pos, time));
+    vec3 ip1 = i + vec3(1.0);
+    vec3 f = vec3(pos, time) - i;
+    
+    vec4 mi = mod(vec4(i.xy, ip1.xy), scale.xyxy);
+    i.xy = mi.xy;
+    ip1.xy = mi.zw;
 
-    float a = hash(rotation * i);
-    float b = hash(rotation * mod(i + vec2(1.0, 0.0), scale));
-    float c = hash(rotation * mod(i + vec2(0.0, 1.0), scale));
-    float d = hash(rotation * mod(i + vec2(1.0, 1.0), scale));
-
-    vec2 u = f * f * (3.0 - 2.0 * f);
-    return mix(a, b, u.x) + (c - a) * u.y * (1.0 - u.x) + (d - b) * u.x * u.y;
+    vec4 hashLow, hashHigh;
+    multiHash3D(i + seed, ip1 + seed, hashLow, hashHigh);
+    
+    vec3 u = noiseInterpolate(f);
+    vec4 r = mix(hashLow, hashHigh, u.z);
+    r = mix(r.xyxz, r.zwyw, u.yyxx);
+    return (r.x + (r.y - r.x) * u.x) * 2.0 - 1.0;
 }
 
-vec3 noised(const in vec2 pos, vec2 scale) 
+// 2D Value noise with derivatives.
+// @param scale Number of tiles, must be an integer for tileable results, range: [2, inf]
+// @param seed Seed to randomize result, range: [0, inf]
+// @return x = value of the noise, yz = derivative of the noise, range: [-1, 1]
+vec3 noised(vec2 pos, vec2 scale, float seed) 
 {
-    // value noise with derivative based on Inigo Quilez
-    scale = floor(scale);
-    vec2 p = mod(pos * scale, scale);
-    vec2 i = floor(p);
-    vec2 f = fract(p);
+    // value noise with derivatives based on Inigo Quilez
+    pos *= scale;
+    vec4 i = floor(pos).xyxy + vec2(0.0, 1.0).xxyy;
+    vec2 f = pos - i.xy;
+    i = mod(i, scale.xyxy) + seed;
+
+    vec4 hash = multiHash2D(i);
+    float a = hash.x;
+    float b = hash.y;
+    float c = hash.z;
+    float d = hash.w;
     
-    float a = hash(i);
-    float b = hash(mod(i + vec2(1.0, 0.0), scale));
-    float c = hash(mod(i + vec2(0.0, 1.0), scale));
-    float d = hash(mod(i + vec2(1.0, 1.0), scale));
-    
-    vec2 f2 = f * f;
-    vec2 u = f2 * f * (f * (f * 6.0 - 15.0) + 10.0); // = smootherStep
-    vec2 du = 30.0 * f2 * (f * (f - 2.0) + 1.0);
-    
+    vec4 udu = noiseInterpolateDu(f);    
     float abcd = a - b - c + d;
-    float value = a + (b - a) * u.x + (c - a) * u.y + abcd * u.x * u.y;
-    vec2 derivative = du * (u.yx * abcd + vec2(b, c) - a);
-    return vec3(value, derivative);
+    float value = a + (b - a) * udu.x + (c - a) * udu.y + abcd * udu.x * udu.y;
+    vec2 derivative = udu.zw * (udu.yx * abcd + vec2(b, c) - a);
+    return vec3(value * 2.0 - 1.0, derivative);
 }
 
-// @note position must be premultiplied with the scale
-vec3 noised(const in vec2 pos, vec2 scale, const in mat2 rotation) 
+// 2D Value noise with derivatives and time (or height) domain.
+// @param scale Number of tiles, must be an integer for tileable results, range: [2, inf]
+// @param time The height phase for the noise value, range: [0, inf], default: 0.0
+// @param seed Seed to randomize result, range: [0, inf]
+// @return x = value of the noise, yz = derivative of the noise, w = derivative of the time, range: [-1, 1]
+vec4 noised(vec2 pos, vec2 scale, float time, float seed) 
 {
-    // value noise with derivative based on Inigo Quilez
-    scale = floor(scale);
-    vec2 p = mod(pos, scale);
-    vec2 i = floor(p);
-    vec2 f = fract(p);
+    // based on Analytical Noise Derivatives by Brian Sharpe
+    // classic value noise with 3D
+    pos *= scale;
+    vec3 i = floor(vec3(pos, time));
+    vec3 ip1 = i + vec3(1.0);
+    vec3 f = vec3(pos, time) - i;
     
-    float a = hash(rotation * i);
-    float b = hash(rotation * mod(i + vec2(1.0, 0.0), scale));
-    float c = hash(rotation * mod(i + vec2(0.0, 1.0), scale));
-    float d = hash(rotation * mod(i + vec2(1.0, 1.0), scale));
+    vec4 mi = mod(vec4(i.xy, ip1.xy), scale.xyxy);
+    i.xy = mi.xy;
+    ip1.xy = mi.zw;
+
+    vec4 hashLow, hashHigh;
+    multiHash3D(i + seed, ip1 + seed, hashLow, hashHigh);
+
+    vec3 u, du;
+    noiseInterpolateDu(f, u, du);
+    vec4 res0 = mix(hashLow, hashHigh, u.z);
+    vec4 res1 = mix(res0.xyxz, res0.zwyw, u.yyxx);
+    vec4 res2 = mix(vec4(hashLow.xy, hashHigh.xy), vec4(hashLow.zw, hashHigh.zw), u.y);
+    vec2 res3 = mix(res2.xz, res2.yw, u.x);
+    vec4 results = vec4(res1.x, 0.0, 0.0, 0.0) + (vec4(res1.yyw, res3.y) - vec4(res1.xxz, res3.x)) * vec4(u.x, du);
+    return vec4(results.x * 2.0 - 1.0, results.yzw);
+}
+
+// 2D Variant of Value noise that produces ridge-like noise by using multiple noise values.
+// @param scale Number of tiles, must be integer for tileable results, range: [2, inf]
+// @param translate Translate factors for the value noise , range: [-inf, inf], default: {0.5, -0.25, 0.15}
+// @param intensity The contrast for the noise, range: [0, 1], default: 0.75
+// @param time The height phase for the noise value, range: [0, inf], default: 0.0
+// @param seed Seed to randomize result, range: [0, inf]
+// @return Value of the noise, range: [0, 1]
+float gridNoise(vec2 pos, vec2 scale, vec3 translate, float intensity, float time, float seed)
+{
+    vec4 n; 
+    n.x = noise(pos, scale, time, seed);
+    n.y = noise(pos + translate.x, scale, time, seed);
+    n.z = noise(pos + translate.y, scale, time, seed);
+    n.w = noise(pos + translate.z, scale, time, seed);
+    n.xy = n.xy * n.zw;
     
-    vec2 f2 = f * f;
-    vec2 u = f2 * f * (f * (f * 6.0 - 15.0) + 10.0); // = smootherStep
-    vec2 du = 30.0 * f2 * (f * (f - 2.0) + 1.0);
+    float t = abs(n.x * n.y);
+    return pow(t, mix(0.5, 0.1, intensity));
+}
+
+// 2D Variant of Value noise that produces ridge-like noise by using multiple noise values.
+// @param scale Number of tiles, must be integer for tileable results, range: [2, inf]
+// @param intensity The contrast for the noise, range: [0, 1], default: 0.75
+// @param time The height phase for the noise value, range: [0, inf], default: 0.0
+// @param seed Seed to randomize result, range: [0, inf]
+// @return Value of the noise, range: [0, 1]
+float gridNoise(vec2 pos, vec2 scale, float intensity, float time, float seed)
+{
+    vec3 translate = (hash3D(vec2(seed)) * 2.0 - 1.0) * scale.xyx;
     
-    float abcd = a - b - c + d;
-    float value = a + (b - a) * u.x + (c - a) * u.y + abcd * u.x * u.y;
-    vec2 derivative = du * (u.yx * abcd + vec2(b, c) - a);
-    return vec3(value, derivative);
+    vec4 n; 
+    n.x = noise(pos, scale, time, seed);
+    n.y = noise(pos + translate.x, scale, time, seed);
+    n.z = noise(pos + translate.y, scale, time, seed);
+    n.w = noise(pos + translate.z, scale, time, seed);
+    n.xy = n.xy * n.zw;
+    
+    float t = abs(n.x * n.y);
+    return pow(t, mix(0.5, 0.1, intensity));
+}
+
+// 2D Variant of Value noise that produces dots with random size or luminance.
+// @param scale Number of tiles, must be integer for tileable results, range: [2, inf]
+// @param density The density of the dots distribution, range: [0, 1], default: 1.0
+// @param size The radius of the dots, range: [0, 1], default: 0.5
+// @param sizeVariance The variation for the size of the dots, range: [0, 1], default: 0.75
+// @param roundness The roundness of the dots, if zero will result in square, range: [0, 1], default: 1.0
+// @param seed Seed to randomize result, range: [0, inf]
+// @return x = value of the noise, y = random luminance value, z = size of the dot, range: [0, 1]
+vec3 dotsNoise(vec2 pos, vec2 scale, float density, float size, float sizeVariance, float roundness, float seed) 
+{
+    pos *= scale;
+    vec4 i = floor(pos).xyxy + vec2(0.0, 1.0).xxyy;
+    vec2 f = pos - i.xy;
+    i = mod(i, scale.xyxy);
+    
+    vec4 hash = hash4d(i + seed);
+    if (hash.w > density)
+        return vec3(0.0);
+
+    float radius = clamp(size + (hash.z * 2.0 - 1.0) * sizeVariance * 0.5, 0.0, 1.0);
+    float value = radius / size;  
+    radius = 2.0 / radius;
+    f = f * radius - (radius - 1.0);
+    f += hash.xy * (radius - 2.0);
+    f = pow(abs(f), vec2((mix(20.0, 1.0, sqrt(roundness)))));
+
+    float u = 1.0 - min(dot(f, f), 1.0);
+    return vec3(clamp(u * u * u * value, 0.0, 1.0), hash.w, hash.z);
 }
