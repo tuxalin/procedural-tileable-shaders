@@ -1,46 +1,49 @@
-// @note position must be premultiplied with the scale
-vec3 voronoi(const in vec2 pos, const in vec2 scale, const in float jitter, const in mat2 rotation, out vec2 tilePos)
+// Voronoi with the distance from edges.
+// @param scale Number of tiles, must be  integer for tileable results, range: [2, inf]
+// @param jitter Jitter factor for the voronoi cells, if zero then it will result in a square grid, range: [0, 1], default: 1.0
+// @param phase The phase for rotating the cells, range: [0, inf], default: 0.0
+// @param seed Seed to randomize result, range: [0, inf], default: 0.0
+// @return Returns the distance from the cell edges, yz = tile position of the cell, range: [0, 1]
+vec3 voronoi(vec2 pos, vec2 scale, float jitter, float phase, float seed)
 {
-    // voronoi based on Inigo Quilez
+     // voronoi based on Inigo Quilez
+    const float kPI2 = 6.2831853071;
+    pos *= scale;
     vec2 i = floor(pos);
-    vec2 f = fract(pos);
+    vec2 f = pos - i;
 
+    //TODO: optimize this
     // first pass
-    vec2 minPos;
-    float F1 = 1e+5;
-    float F2 = 1e+5;
+    vec2 minPos, tilePos;
+    float minDistance = 1e+5;
     for (int y=-1; y<=1; y++)
     {
         for (int x=-1; x<=1; x++)
         {
             vec2 n = vec2(float(x), float(y));
-            vec2 cPos = rotation * hash2d(mod(i + n, scale)) * jitter;
+            vec2 cPos = hash2D(mod(i + n, scale) + seed) * jitter;
+            cPos = 0.5 * sin(phase + kPI2 * cPos) + 0.5;
             vec2 rPos = n + cPos - f;
 
             float d = dot(rPos, rPos);
-            if(d < F1)
+            if(d < minDistance)
             {
-                F2 = F1;
-                F1 = d;
-                
+                minDistance = d;
                 minPos = rPos;
                 tilePos = cPos;
-            }
-            else if(d < F2) 
-            {
-                F2 = d;
             }
         }
     }
 
-    // second pass, distance to borders
-    float minDistance = 1e+5;
+    // second pass, distance to edges
+    minDistance = 1e+5;
     for (int y=-2; y<=2; y++)
     {
         for (int x=-2; x<=2; x++)
         { 
             vec2 n = vec2(float(x), float(y));
-            vec2 cPos = rotation * hash2d(mod(i + n, scale)) * jitter;
+            vec2 cPos = hash2D(mod(i + n, scale) + seed) * jitter;
+            cPos = 0.5 * sin(phase + kPI2 * cPos) + 0.5;
             vec2 rPos = n + cPos - f;
             
             vec2 v = minPos - rPos;
@@ -49,11 +52,48 @@ vec3 voronoi(const in vec2 pos, const in vec2 scale, const in float jitter, cons
         }
     }
 
-    return vec3(minDistance, F1, F2);
+    return vec3(minDistance, tilePos);
 }
 
-vec3 voronoi(const in vec2 pos, const in vec2 scale, const in float jitter, out vec2 tilePos)
+// @param scale Number of tiles, must be  integer for tileable results, range: [2, inf]
+// @param jitter Jitter factor for the voronoi cells, if zero then it will result in a square grid, range: [0, 1], default: 1.0
+// @param variance The color variance, if zero then it will result in grayscale pattern, range: [0, 1], default: 1.0
+// @param seed Random seed for the color pattern, range: [0, inf], default: 0.0
+// @return Returns the color of the pattern cells., range: [0, 1]
+vec3 voronoiPattern(vec2 pos, vec2 scale, float jitter, float variance, float seed)
 {
-    mat2 identity = mat2(1.0, 0.0, 0.0, 1.0);
-    return voronoi(pos * scale, scale, jitter, identity, tilePos);
+    vec2 tilePos = voronoi(pos, scale, jitter, 0.0, 0.0).yz;
+    float rand = abs(hash1D(tilePos + seed));
+    return (rand < variance ? hash3D(tilePos + seed) : vec3(rand));
+}
+
+// @param scale Number of tiles, must be  integer for tileable results, range: [2, inf]
+// @param jitter Jitter factor for the voronoi cells, if zero then it will result in a square grid, range: [0, 1], default: 1.0
+// @param width Width of the lines, range: [0, 1], default: 0.1
+// @param smoothness Controls how soft the lines are, range: [0, 1], default: 0.0
+// @param warp The warp strength, range: [0, 1], default: 0.0
+// @param warpScale The scale of warp, range: [0, 1], default: 2.0
+// @param warpSmudge If true creates a smudge effect on the lines, range: [false, true], default: false
+// @param seed Seed to randomize result, range: [0, inf], default: 0.0
+// @return Returns the cell position and the value of the pattern, range: [0, 1]
+vec3 cracks(vec2 pos, vec2 scale, float jitter, float width, float smoothness, float warp, float warpScale, bool warpSmudge, float smudgePhase, float seed)
+{
+    vec3 g = gradientNoised(pos, scale * warpScale, smudgePhase);
+    pos += (warpSmudge ? g.yz : g.xx) * 0.1 * warp;
+    vec3 v = voronoi(pos, scale, jitter, 0.0, seed);
+    return vec3(smoothstep(max(width - smoothness, 0.0), width + fwidth(v.x), v.x), v.yz);
+}
+
+// @param scale Number of tiles, must be  integer for tileable results, range: [2, inf]
+// @param jitter Jitter factor for the voronoi cells, if zero then it will result in a square grid, range: [0, 1], default: 1.0
+// @param width Width of the lines, range: [0, 1], default: 0.1
+// @param smoothness Controls how soft the lines are, range: [0, 1], default: 0.0
+// @param warp The warp strength, range: [0, 1], default: 0.0
+// @param warpScale The scale of warp, range: [0, 1], default: 2.0
+// @param warpSmudge If true creates a smudge effect on the lines, range: [false, true], default: false
+// @param seed Seed to randomize result, range: [0, inf], default: 0.0
+// @return Returns the value of the pattern, range: [0, 1]
+float cracks(vec2 pos, vec2 scale, float jitter, float width, float smoothness, float warp, float warpScale, bool warpSmudge, float seed)
+{   
+    return cracks(pos, scale, jitter, width, smoothness, warp, warpScale, warpSmudge, 0.0, seed).x;
 }
