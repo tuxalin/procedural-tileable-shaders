@@ -4,7 +4,7 @@
 // @return Value of the noise, range: [-1, 1]
 float perlinNoise(vec2 pos, vec2 scale, float seed)
 {
-    // based on: http://briansharpe.wordpress.com/2012/03/09/modifications-to-classic-perlin-noise/
+    // based on Modifications to Classic Perlin Noise by Brian Sharpe: https://archive.is/cJtlS
     pos *= scale;
     vec4 i = floor(pos).xyxy + vec2(0.0, 1.0).xxyy;
     vec4 f = (pos.xyxy - i.xyxy) - vec2(0.0, 1.0).xxyy;
@@ -34,7 +34,7 @@ float perlinNoise(vec2 pos, vec2 scale, float seed)
 // @return Value of the noise, range: [-1, 1]
 float perlinNoise(vec2 pos, vec2 scale, mat2 transform, float seed)
 {
-    // based on: http://briansharpe.wordpress.com/2012/03/09/modifications-to-classic-perlin-noise/
+    // based on Modifications to Classic Perlin Noise by Brian Sharpe: https://archive.is/cJtlS
     pos *= scale;
     vec4 i = floor(pos).xyxy + vec2(0.0, 1.0).xxyy;
     vec4 f = (pos.xyxy - i.xyxy) - vec2(0.0, 1.0).xxyy;
@@ -86,7 +86,7 @@ float perlinNoise(vec2 pos, vec2 scale, float rotation, float seed)
 // @return x = value of the noise, yz = derivative of the noise, range: [-1, 1]
 vec3 perlinNoised(vec2 pos, vec2 scale, float seed)
 {
-    // based on: http://briansharpe.wordpress.com/2012/03/09/modifications-to-classic-perlin-noise/
+    // based on Modifications to Classic Perlin Noise by Brian Sharpe: https://archive.is/cJtlS
     pos *= scale;
     vec4 i = floor(pos).xyxy + vec2(0.0, 1.0).xxyy;
     vec4 f = (pos.xyxy - i.xyxy) - vec2(0.0, 1.0).xxyy;
@@ -119,7 +119,7 @@ vec3 perlinNoised(vec2 pos, vec2 scale, float seed)
 // @return x = value of the noise, yz = derivative of the noise, range: [-1, 1]
 vec3 perlinNoised(vec2 pos, vec2 scale, mat2 transform, float seed)
 {
-    // based on: http://briansharpe.wordpress.com/2012/03/09/modifications-to-classic-perlin-noise/
+    // based on Modifications to Classic Perlin Noise by Brian Sharpe: https://archive.is/cJtlS
     pos *= scale;
     vec4 i = floor(pos).xyxy + vec2(0.0, 1.0).xxyy;
     vec4 f = (pos.xyxy - i.xyxy) - vec2(0.0, 1.0).xxyy;
