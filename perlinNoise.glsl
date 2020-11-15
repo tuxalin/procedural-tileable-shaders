@@ -1,70 +1,190 @@
-float perlinNoise(const in vec2 pos, vec2 scale)
+// 2D Perlin noise.
+// @param scale Number of tiles, must be  integer for tileable results, range: [2, inf]
+// @param seed Seed to randomize result, range: [0, inf], default: 0.0
+// @return Value of the noise, range: [-1, 1]
+float perlinNoise(vec2 pos, vec2 scale, float seed)
 {
-    // classic Perlin noise based on Stefan Gustavson
-    scale = floor(scale);
-    vec2 p = pos * scale;
-    vec4 i = mod(floor(p.xyxy) + vec4(0.0, 0.0, 1.0, 1.0), scale.xyxy);
-    vec4 f = fract(p.xyxy) - vec4(0.0, 0.0, 1.0, 1.0);
-    i = mod(i, 289.0); // avoid truncation effects in permutation
-    
-    vec4 ix = i.xzxz;
-    vec4 iy = i.yyww;
-    vec4 fx = f.xzxz;
-    vec4 fy = f.yyww;
-    
-    vec4 ixy = permute(permute(ix) + iy);
-    vec4 gx = 2.0 * fract(ixy * 0.0243902439) - 1.0; // 1/41 = 0.024...
-    vec4 gy = abs(gx) - 0.5;
-    vec4 tx = floor(gx + 0.5);
-    gx = gx - tx;
-    
-    vec2 g00 = vec2(gx.x,gy.x);
-    vec2 g10 = vec2(gx.y,gy.y);
-    vec2 g01 = vec2(gx.z,gy.z);
-    vec2 g11 = vec2(gx.w,gy.w);
-    
-    vec4 norm = 1.79284291400159 - 0.85373472095314 * 
-    vec4(dot(g00, g00), dot(g01, g01), dot(g10, g10), dot(g11, g11));
-    g00 *= norm.x;
-    g01 *= norm.y;
-    g10 *= norm.z;
-    g11 *= norm.w;
-    float n00 = dot(g00, vec2(fx.x, fy.x));
-    float n10 = dot(g10, vec2(fx.y, fy.y));
-    float n01 = dot(g01, vec2(fx.z, fy.z));
-    float n11 = dot(g11, vec2(fx.w, fy.w));
-    
-    vec2 fade_xy = smootherStep(f.xy);
-    vec2 n_x = mix(vec2(n00, n01), vec2(n10, n11), fade_xy.x);
-    float n_xy = mix(n_x.x, n_x.y, fade_xy.y);
-    return 2.0 * n_xy;
+    // based on: http://briansharpe.wordpress.com/2012/03/09/modifications-to-classic-perlin-noise/
+    pos *= scale;
+    vec4 i = floor(pos).xyxy + vec2(0.0, 1.0).xxyy;
+    vec4 f = (pos.xyxy - i.xyxy) - vec2(0.0, 1.0).xxyy;
+    i = mod(i, scale.xyxy) + seed;
+
+    // grid gradients
+    vec4 gradientX, gradientY;
+    multiHash2D(i, gradientX, gradientY);
+    gradientX -= 0.49999;
+    gradientY -= 0.49999;
+
+    // perlin surflet
+    vec4 gradients = inversesqrt(gradientX * gradientX + gradientY * gradientY) * (gradientX * f.xzxz + gradientY * f.yyww);
+    // normalize: 1.0 / 0.75^3
+    gradients *= 2.3703703703703703703703703703704;
+    vec4 lengthSq = f * f;
+    lengthSq = lengthSq.xzxz + lengthSq.yyww;
+    vec4 xSq = 1.0 - min(vec4(1.0), lengthSq); 
+    xSq = xSq * xSq * xSq;
+    return dot(xSq, gradients);
 }
 
-// @note position must be premultiplied with the scale
-float perlinNoise(const in vec2 pos, vec2 scale, const in mat2 rotation) 
+// 2D Perlin noise with gradients transform (i.e. can be used to rotate the gradients).
+// @param scale Number of tiles, must be  integer for tileable results, range: [2, inf]
+// @param transform transform matrix for the noise gradients.
+// @param seed Seed to randomize result, range: [0, inf], default: 0.0
+// @return Value of the noise, range: [-1, 1]
+float perlinNoise(vec2 pos, vec2 scale, mat2 transform, float seed)
 {
-    scale = floor(scale);
-    vec2 p = pos;
-    vec2 i = floor(p);
-    vec2 a = i;
-    vec2 b = i + vec2(1.0, 0.0);
-    vec2 c = i + vec2(0.0, 1.0);
-    vec2 d = i + vec2(1.0, 1.0);
+    // based on: http://briansharpe.wordpress.com/2012/03/09/modifications-to-classic-perlin-noise/
+    pos *= scale;
+    vec4 i = floor(pos).xyxy + vec2(0.0, 1.0).xxyy;
+    vec4 f = (pos.xyxy - i.xyxy) - vec2(0.0, 1.0).xxyy;
+    i = mod(i, scale.xyxy) + seed;
 
-    vec2 g0 = rotation * hash2d(mod(a, scale));
-    vec2 g1 = rotation * hash2d(mod(b, scale));
-    vec2 g2 = rotation * hash2d(mod(c, scale));
-    vec2 g3 = rotation * hash2d(mod(d, scale));
+    // grid gradients
+    vec4 gradientX, gradientY;
+    multiHash2D(i, gradientX, gradientY);
+    gradientX -= 0.49999;
+    gradientY -= 0.49999;
 
-    vec2 u = smootherStep(p - i);
-    float ab = (1.0 - u.x) * dot(g0, (p - a)) + u.x * dot(g1, (p - b)); // upper points
-    float cd = (1.0 - u.x) * dot(g2, (p - c)) + u.x * dot(g3, (p - d)); // lower points
-    return 2.3 * mix(ab, cd, u.y);
+    // transform gradients
+    vec4 rhash = vec4(gradientX.x, gradientY.x, gradientX.y, gradientY.y);
+    rhash.xy = transform * rhash.xy;
+    rhash.zw = transform * rhash.zw;
+    gradientX.xy = rhash.xz;
+    gradientY.xy = rhash.yw;
+
+    rhash = vec4(gradientX.z, gradientY.z, gradientX.w, gradientY.w);
+    rhash.xy = transform * rhash.xy;
+    rhash.zw = transform * rhash.zw;
+    gradientX.zw = rhash.xz;
+    gradientY.zw = rhash.yw;
+
+    // perlin surflet
+    vec4 gradients = inversesqrt(gradientX * gradientX + gradientY * gradientY) * (gradientX * f.xzxz + gradientY * f.yyww);
+    // normalize: 1.0 / 0.75^3
+    gradients *= 2.3703703703703703703703703703704;
+    f = f * f;
+    f = f.xzxz + f.yyww;
+    vec4 xSq = 1.0 - min(vec4(1.0), f); 
+    return dot(xSq * xSq * xSq, gradients);
 }
 
-float perlinNoise(const in vec2 pos, vec2 scale, const in float rotation) 
+// 2D Perlin noise with gradients rotation.
+// @param scale Number of tiles, must be  integer for tileable results, range: [2, inf]
+// @param rotation Rotation for the noise gradients, useful to animate flow, range: [0, PI]
+// @param seed Seed to randomize result, range: [0, inf], default: 0.0
+// @return Value of the noise, range: [-1, 1]
+float perlinNoise(vec2 pos, vec2 scale, float rotation, float seed) 
 {
-    float sinR = sin(rotation);
-    float cosR = cos(rotation);
-    return perlinNoise(pos, scale, mat2(cosR, sinR, sinR, cosR));
+    vec2 sinCos = vec2(sin(rotation), cos(rotation));
+    return perlinNoise(pos, scale, mat2(sinCos.y, sinCos.x, sinCos.x, sinCos.y), seed);
+}
+
+// 2D Perlin noise with derivatives.
+// @param scale Number of tiles, must be  integer for tileable results, range: [2, inf]
+// @param seed Seed to randomize result, range: [0, inf], default: 0.0
+// @return x = value of the noise, yz = derivative of the noise, range: [-1, 1]
+vec3 perlinNoised(vec2 pos, vec2 scale, float seed)
+{
+    // based on: http://briansharpe.wordpress.com/2012/03/09/modifications-to-classic-perlin-noise/
+    pos *= scale;
+    vec4 i = floor(pos).xyxy + vec2(0.0, 1.0).xxyy;
+    vec4 f = (pos.xyxy - i.xyxy) - vec2(0.0, 1.0).xxyy;
+    i = mod(i, scale.xyxy) + seed;
+
+    // grid gradients
+    vec4 gradientX, gradientY;
+    multiHash2D(i, gradientX, gradientY);
+    gradientX -= 0.49999;
+    gradientY -= 0.49999;
+
+    // perlin surflet
+    vec4 gradients = inversesqrt(gradientX * gradientX + gradientY * gradientY) * (gradientX * f.xzxz + gradientY * f.yyww);
+    vec4 m = f * f;
+    m = m.xzxz + m.yyww;
+    m = max(1.0 - m, 0.0);
+    vec4 m2 = m * m;
+    vec4 m3 = m * m2;
+    // compute the derivatives
+    vec4 m2Gradients = -6.0 * m2 * gradients;
+    vec2 grad = vec2(dot(m2Gradients, f.xzxz), dot(m2Gradients, f.yyww)) + vec2(dot(m3, gradientX), dot(m3, gradientY));
+    // sum the surflets and normalize: 1.0 / 0.75^3
+    return vec3(dot(m3, gradients), grad) * 2.3703703703703703703703703703704;
+}
+
+// 2D Perlin noise with derivatives and gradients transform (i.e. can be used to rotate the gradients).
+// @param scale Number of tiles, must be  integer for tileable results, range: [2, inf]
+// @param rotation Rotation for the noise gradients, useful to animate flow, range: [0, PI]
+// @param seed Seed to randomize result, range: [0, inf], default: 0.0
+// @return x = value of the noise, yz = derivative of the noise, range: [-1, 1]
+vec3 perlinNoised(vec2 pos, vec2 scale, mat2 transform, float seed)
+{
+    // based on: http://briansharpe.wordpress.com/2012/03/09/modifications-to-classic-perlin-noise/
+    pos *= scale;
+    vec4 i = floor(pos).xyxy + vec2(0.0, 1.0).xxyy;
+    vec4 f = (pos.xyxy - i.xyxy) - vec2(0.0, 1.0).xxyy;
+    i = mod(i, scale.xyxy) + seed;
+
+    // grid gradients
+    vec4 gradientX, gradientY;
+    multiHash2D(i, gradientX, gradientY);
+    gradientX -= 0.49999;
+    gradientY -= 0.49999;
+
+    // transform gradients
+    vec4 rhash = vec4(gradientX.x, gradientY.x, gradientX.y, gradientY.y);
+    rhash.xy = transform * rhash.xy;
+    rhash.zw = transform * rhash.zw;
+    gradientX.xy = rhash.xz;
+    gradientY.xy = rhash.yw;
+    
+    rhash = vec4(gradientX.z, gradientY.z, gradientX.w, gradientY.w);
+    rhash.xy = transform * rhash.xy;
+    rhash.zw = transform * rhash.zw;
+    gradientX.zw = rhash.xz;
+    gradientY.zw = rhash.yw;
+
+    // perlin surflet
+    vec4 gradients = inversesqrt(gradientX * gradientX + gradientY * gradientY) * (gradientX * f.xzxz + gradientY * f.yyww);
+    vec4 m = f * f;
+    m = m.xzxz + m.yyww;
+    m = max(1.0 - m, 0.0);
+    vec4 m2 = m * m;
+    vec4 m3 = m * m2;
+    // compute the derivatives
+    vec4 m2Gradients = -6.0 * m2 * gradients;
+    vec2 grad = vec2(dot(m2Gradients, f.xzxz), dot(m2Gradients, f.yyww)) + vec2(dot(m3, gradientX), dot(m3, gradientY));
+    // sum the surflets and normalize: 1.0 / 0.75^3
+    return vec3(dot(m3, gradients), grad) * 2.3703703703703703703703703703704;
+}
+
+// 2D Perlin noise with derivatives and gradients rotation.
+// @param scale Number of tiles, must be  integer for tileable results, range: [2, inf]
+// @param rotation Rotation for the noise gradients, useful to animate flow, range: [0, PI]
+// @param seed Seed to randomize result, range: [0, inf], default: 0.0
+// @return x = value of the noise, yz = derivative of the noise, range: [-1, 1]
+vec3 perlinNoised(vec2 pos, vec2 scale, float rotation, float seed) 
+{
+    vec2 sinCos = vec2(sin(rotation), cos(rotation));
+    return perlinNoised(pos, scale, mat2(sinCos.y, sinCos.x, sinCos.x, sinCos.y), seed);
+}
+
+// 2D Variant of Perlin noise that produces and organic-like noise.
+// @param scale Number of tiles, must be  integer for tileable results, range: [2, inf]
+// @param density The density of the lower frequency details, range: [0, 1], default: 0.5
+// @param phase The phase of the noise, range: [-inf, inf], default: {0, 0}
+// @param contrast Controls the contrast of the result, range: [0, 1], default: 0.5
+// @param highlights Controls the highlights of the , range: [0, 1], default: 0.25
+// @param shift Shifts the angle of the highlights, range: [0, 1], default: 0.5
+// @param seed Seed to randomize result, range: [0, inf], default: 0.0
+// @return Value of the noise, range: [0, 1]
+float organicNoise(vec2 pos, vec2 scale, float density, vec2 phase, float contrast, float highlights, float shift, float seed)
+{
+    vec2 s = mix(vec2(1.0), scale - 1.0, density);
+    float nx = perlinNoise(pos + phase, scale, seed);
+    float ny = perlinNoise(pos, s, seed);
+
+    float n = length(vec2(nx, ny) * mix(vec2(2.0, 0.0), vec2(0.0, 2.0), shift));
+    n = pow(n, 1.0 + 8.0 * contrast) + (0.15 * highlights) / n;
+    return n * 0.5;
 }
