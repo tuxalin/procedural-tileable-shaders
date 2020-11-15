@@ -1,5 +1,5 @@
 
-// based on: http://briansharpe.wordpress.com/2011/10/01/gpu-texture-free-noise/
+// based on GPU Texture-Free Noise by Brian Sharpe: https://archive.is/Hn54S
 vec3 permutePrepareMod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
 vec4 permutePrepareMod289(vec4 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
 vec4 permuteResolve(vec4 x) { return fract( x * (7.0 / 288.0 )); }
@@ -85,7 +85,7 @@ void permuteHash3D(vec3 cell, vec3 cellPlusOne, out vec4 lowHash, out vec4 highH
 // generates a random number for each of the 8 cell corners
 void fastHash3D(vec3 cell, vec3 cellPlusOne, out vec4 lowHash, out vec4 highHash)
 {
-    // based on: https://briansharpe.wordpress.com/2011/11/15/a-fast-and-simple-32bit-floating-point-hash-function/
+    // based on: https://archive.is/wip/7j1wv
     const vec2 kOffset = vec2(50.0, 161.0);
     const float kDomainScale = 289.0;
     const float kLargeValue = 635.298681;

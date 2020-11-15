@@ -5,7 +5,7 @@ float triangleWave(float x)
     return abs(fract(t) * 2.0 - 1.0) * 2.0 - 1.0;
 }
 
-float wavePattern(const in vec2 pos, vec2 scale, const in float width, const in float smoothness, const in float amplitude, const in float interpolate)
+float wavePattern(vec2 pos, vec2 scale, float width, float smoothness, float amplitude, float interpolate)
 {
     scale = floor(scale);
     const float pi = 3.141592;
@@ -18,7 +18,7 @@ float wavePattern(const in vec2 pos, vec2 scale, const in float width, const in 
     return 1.0 - smoothstep(max(width - smoothness, 0.0), width, t * 0.5 + 0.5);
 }
 
-float crossPattern(const in vec2 pos, vec2 scale, const in vec2 smoothness)
+float crossPattern(vec2 pos, vec2 scale, vec2 smoothness)
 {
     scale = floor(scale);
     vec2 p = pos * scale;
@@ -34,7 +34,7 @@ float crossPattern(const in vec2 pos, vec2 scale, const in vec2 smoothness)
     return 1.0 - i.x - i.y + 2.0 * i.x * i.y;
 }
 
-float stairsPattern(const in vec2 pos, vec2 scale, float width, float smoothness, float distance)   
+float stairsPattern(vec2 pos, vec2 scale, float width, float smoothness, float distance)   
 {
     vec2 p = pos * scale;
     vec2 f = fract(p);
@@ -44,4 +44,35 @@ float stairsPattern(const in vec2 pos, vec2 scale, float width, float smoothness
     d = mix(d, abs(d * 2.0 - 1.0), distance);
     
     return 1.0 - smoothstep(max(width - smoothness, 0.0), width, d);        
+}
+
+float sdfLens(vec2 p, float width, float height)
+{
+    float d = height / width - width / 4.0;
+    float r = width / 2.0 + d;
+    
+    p = abs(p);
+
+    float b = sqrt(r * r - d * d);
+    vec4 par = p.xyxy - vec4(0.0, b, -d, 0.0);
+    return (par.y * d > p.x * b) ? length(par.xy) : length(par.zw) - r;
+}
+
+vec3 tileWeave(vec2 pos, vec2 scale, float count, float width, float smoothness)
+{
+    vec2 i = floor(pos * scale);    
+    float c = mod(i.x + i.y, 2.0);
+    
+    vec2 p = fract(pos.st * scale);
+    p = mix(p.st, p.ts, c);
+    p = fract(p * vec2(count, 1.0));
+    
+    // Vesica SDF based on Inigo Quilez
+    width *= 2.0;
+    p = p * 2.0 - 1.0;
+    float d = sdfLens(p, width, 1.0);
+    vec2 grad = vec2(dFdx(d), dFdy(d));
+
+    float s = 1.0 - smoothstep(0.0, dot(abs(grad), vec2(1.0)) + smoothness, -d);
+    return vec3(s, normalize(grad) * smoothstep(1.0, 0.99, s) * smoothstep(0.0, 0.01, s)); 
 }
