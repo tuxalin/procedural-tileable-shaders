@@ -176,6 +176,53 @@ vec3 cellularNoised(vec2 pos, vec2 scale, float jitter, float seed)
     return  t * vec3(1.0, -2.0, -2.0) * (1.0 / 1.125);
 }
 
+// Classic 3x3 Cellular noise with F1 and F2 distances and derivatives.
+// @param scale Number of tiles, must be  integer for tileable results, range: [2, inf]
+// @param jitter Jitter factor for the cells, if zero then it will result in a square grid, range: [0, 1], default: 1.0
+// @param phase The phase for rotating the cells, range: [0, inf], default: 0.0
+// @param seed Seed to randomize result, range: [0, inf], default: 0.0
+// @return x = value of the noise, yz = derivative of the noise, range: [-1, 1]
+vec3 cellularNoised(vec2 pos, vec2 scale, float jitter, float phase, float seed) 
+{       
+    const float kPI2 = 6.2831853071;
+    pos *= scale;
+    vec2 i = floor(pos);
+    vec2 f = pos - i;
+    i = mod(i, scale) + seed;
+    
+    const vec3 offset = vec3(-1.0, 0.0, 1.0);
+    vec4 cells = mod(i.xyxy + offset.xxzz, scale.xyxy);
+    vec4 dx0, dy0, dx1, dy1;
+    multiHash2D(vec4(cells.xy, vec2(i.x, cells.y)), vec4(cells.zyx, i.y), dx0, dy0);
+    multiHash2D(vec4(cells.zwz, i.y), vec4(cells.xw, vec2(i.x, cells.w)), dx1, dy1);
+    dx0 = 0.5 * sin(phase + kPI2 * dx0) + 0.5;
+    dy0 = 0.5 * sin(phase + kPI2 * dy0) + 0.5;
+    dx1 = 0.5 * sin(phase + kPI2 * dx1) + 0.5;
+    dy1 = 0.5 * sin(phase + kPI2 * dy1) + 0.5;
+    
+    dx0 = offset.xyzx + dx0 * jitter - f.xxxx; // -1 0 1 -1
+    dy0 = offset.xxxy + dy0 * jitter - f.yyyy; // -1 -1 -1 0
+    dx1 = offset.zzxy + dx1 * jitter - f.xxxx; // 1 1 -1 0
+    dy1 = offset.zyzz + dy1 * jitter - f.yyyy; // 1 0 1 1
+    vec4 d0 = dx0 * dx0 + dy0 * dy0; 
+    vec4 d1 = dx1 * dx1 + dy1 * dy1; 
+    
+    vec2 centerPos = (0.5 * sin(phase + kPI2 *  hash2D(i)) + 0.5) * jitter - f; // 0 0
+    float dCenter = dot(centerPos, centerPos);
+    vec4 d = min(d0, d1);
+    vec4 less = step(d1, d0);
+    vec4 dx = mix(dx0, dx1, less);
+    vec4 dy = mix(dy0, dy1, less);
+
+    vec3 t1 = d.x < d.y ? vec3(d.x, dx.x, dy.x) : vec3(d.y, dx.y, dy.y);
+    vec3 t2 = d.z < d.w ? vec3(d.z, dx.z, dy.z) : vec3(d.w, dx.w, dy.w);
+    t2 = t2.x < dCenter ? t2 : vec3(dCenter, centerPos);
+    vec3 t = t1.x < t2.x ? t1 : t2;
+    t.x = sqrt(t.x);
+    // normalize: 0.75^2 * 2.0  == 1.125
+    return  t * vec3(1.0, -2.0, -2.0) * (1.0 / 1.125);
+}
+
 // A variation of 3x3 Cellular noise that multiplies the minimum distance between the cells.
 // @param scale Number of tiles, must be  integer for tileable results, range: [2, inf]
 // @param jitter Jitter factor for the cells, if zero then it will result in a square grid, range: [0, 1], default: 1.0
