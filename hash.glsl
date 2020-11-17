@@ -59,6 +59,19 @@ vec2 hash2D(vec2 x)
     return vec2(n) * (1.0 / float(0xffffffffu));
 }
 
+// Generates two random numbers for each each input.
+// @return Value of the noise, range: [0, 1]
+vec4 hash2D(vec2 x, vec2 y)
+{
+    // based on: Inigo Quilez, Integer Hash - III, 2017
+    uvec4 q0 = uvec2(x * 8192.0).xyyx + uvec2(0u, 3115245u).xxyy;
+    uvec4 q1 = uvec2(y * 8192.0).xyyx + uvec2(0u, 3115245u).xxyy;
+    q0 = 1103515245u * ((q0 >> 1u) ^ q0.yxwz);
+    q1 = 1103515245u * ((q1 >> 1u) ^ q1.yxwz);
+    uvec4 n = 1103515245u * (uvec4(q0.xz, q1.xz) ^ (uvec4(q0.yw, q1.yw) >> 3u));
+    return vec4(n) * (1.0 / float(0xffffffffu));
+}
+
 // @return Value of the noise, range: [0, 1]
 vec3 hash3D(vec2 x) 
 {

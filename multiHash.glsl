@@ -21,18 +21,6 @@ void permuteHash2D(vec4 cell, out vec4 hashX, out vec4 hashY)
     hashX = permuteResolve(hashX);
 }
 
-// generates two random numbers for each each input
-vec4 hash2D(vec2 x, vec2 y)
-{
-    // based on: Inigo Quilez, Integer Hash - III, 2017
-    uvec4 q0 = uvec2(x * 65536.0).xyyx + uvec2(0u, 3115245u).xxyy;
-    uvec4 q1 = uvec2(y * 65536.0).xyyx + uvec2(0u, 3115245u).xxyy;
-    q0 = 1103515245u * ((q0 >> 1u) ^ q0.yxwz);
-    q1 = 1103515245u * ((q1 >> 1u) ^ q1.yxwz);
-    uvec4 n = 1103515245u * (uvec4(q0.xz, q1.xz) ^ (uvec4(q0.yw, q1.yw) >> 3u));
-    return vec4(n) * (1.0 / float(0xffffffffu));
-}
-
 // generates a random number for each of the 4 cell corners
 vec4 betterHash2D(vec4 cell)    
 {
