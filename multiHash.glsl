@@ -21,16 +21,6 @@ void permuteHash2D(vec4 cell, out vec4 hashX, out vec4 hashY)
     hashX = permuteResolve(hashX);
 }
 
-// generates a random number for each each input
-vec2 hash1D(vec2 x, vec2 y)
-{
-    // based on: Inigo Quilez, Integer Hash - III, 2017
-    uvec4 q = uvec4(uvec2(x * 65536.0), uvec2(y * 65536.0));
-    q = 1103515245u * ((q >> 1u) ^ q.yxwz);
-    uvec2 n = 1103515245u * (q.xz ^ (q.yw >> 3u));
-    return vec2(n) * (1.0 / float(0xffffffffu));
-}
-
 // generates two random numbers for each each input
 vec4 hash2D(vec2 x, vec2 y)
 {
@@ -46,19 +36,19 @@ vec4 hash2D(vec2 x, vec2 y)
 // generates a random number for each of the 4 cell corners
 vec4 betterHash2D(vec4 cell)    
 {
-    vec4 hash;
-    hash.xy = hash1D(cell.xy, cell.zy);
-    hash.zw = hash1D(cell.xw, cell.zw);;
-    return hash;
+    uvec4 i = uvec4(cell) + 101323u;
+    uvec4 hash = ihash1D(ihash1D(i.xzxz) + i.yyww);
+    return vec4(hash) * (1.0 / float(0xffffffffu));
 }
 
 // generates 2 random numbers for each of the 4 cell corners
 void betterHash2D(vec4 cell, out vec4 hashX, out vec4 hashY)
 {
-    vec4 hash0 = hash2D(cell.xy, cell.zy);
-    vec4 hash1 = hash2D(cell.xw, cell.zw);
-    hashX = vec4(hash0.xz, hash1.xz);
-    hashY = vec4(hash0.yw, hash1.yw);
+    uvec4 i = uvec4(cell) + 101323u;
+    uvec4 hash0 = ihash1D(ihash1D(i.xzxz) + i.yyww);
+    uvec4 hash1 = ihash1D(hash0 ^ 1933247u);
+    hashX = vec4(hash0) * (1.0 / float(0xffffffffu));
+    hashY = vec4(hash1) * (1.0 / float(0xffffffffu));
 }
 
 void betterHash2D(vec4 coords0, vec4 coords1, out vec4 hashX, out vec4 hashY)
@@ -106,8 +96,6 @@ void fastHash3D(vec3 cell, vec3 cellPlusOne, out vec4 lowHash, out vec4 highHash
 // generates a random number for each of the 8 cell corners
 void betterHash3D(vec3 cell, vec3 cellPlusOne, out vec4 lowHash, out vec4 highHash)
 {
-    cell *= 4096.0;
-    cellPlusOne *= 4096.0;
     uvec4 cells = uvec4(cell.xy, cellPlusOne.xy);  
     uvec4 hash = ihash1D(ihash1D(cells.xzxz) + cells.yyww);
     
