@@ -155,7 +155,7 @@ float fbmPerlin(vec2 pos, vec2 scale, int octaves, float shift, float axialShift
     float value = 0.0;
     for (int i = 0; i < octaves; i++) 
     {
-        float pn = perlinNoise(p / frequency, frequency, angle) + offset;
+        float pn = perlinNoise(p / frequency, frequency, angle, seed) + offset;
         if (mode == 0u)
         {
             n *= abs(pn);

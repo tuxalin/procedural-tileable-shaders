@@ -6,7 +6,7 @@
 // @return Returns the distance from the cell edges, yz = tile position of the cell, range: [0, 1]
 vec3 voronoi(vec2 pos, vec2 scale, float jitter, float phase, float seed)
 {
-     // voronoi based on Inigo Quilez
+     // voronoi based on Inigo Quilez: https://archive.is/Ta7dm
     const float kPI2 = 6.2831853071;
     pos *= scale;
     vec2 i = floor(pos);
@@ -58,12 +58,13 @@ vec3 voronoi(vec2 pos, vec2 scale, float jitter, float phase, float seed)
 // @param scale Number of tiles, must be  integer for tileable results, range: [2, inf]
 // @param jitter Jitter factor for the voronoi cells, if zero then it will result in a square grid, range: [0, 1], default: 1.0
 // @param variance The color variance, if zero then it will result in grayscale pattern, range: [0, 1], default: 1.0
+// @param factor The position factor multiplier, range: [0, 10], default: 1.0
 // @param seed Random seed for the color pattern, range: [0, inf], default: 0.0
 // @return Returns the color of the pattern cells., range: [0, 1]
-vec3 voronoiPattern(vec2 pos, vec2 scale, float jitter, float variance, float seed)
+vec3 voronoiPattern(vec2 pos, vec2 scale, float jitter, float variance, float factor, float seed)
 {
     vec2 tilePos = voronoi(pos, scale, jitter, 0.0, 0.0).yz;
-    float rand = abs(hash1D(tilePos + seed));
+    float rand = abs(hash1D(tilePos * factor + seed));
     return (rand < variance ? hash3D(tilePos + seed) : vec3(rand));
 }
 
@@ -78,7 +79,7 @@ vec3 voronoiPattern(vec2 pos, vec2 scale, float jitter, float variance, float se
 // @return Returns the cell position and the value of the pattern, range: [0, 1]
 vec3 cracks(vec2 pos, vec2 scale, float jitter, float width, float smoothness, float warp, float warpScale, bool warpSmudge, float smudgePhase, float seed)
 {
-    vec3 g = gradientNoised(pos, scale * warpScale, smudgePhase);
+    vec3 g = gradientNoised(pos, scale * warpScale, smudgePhase, seed);
     pos += (warpSmudge ? g.yz : g.xx) * 0.1 * warp;
     vec3 v = voronoi(pos, scale, jitter, 0.0, seed);
     return vec3(smoothstep(max(width - smoothness, 0.0), width + fwidth(v.x), v.x), v.yz);
