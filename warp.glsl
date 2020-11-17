@@ -1,39 +1,101 @@
 
-float fbmWarp(const in vec2 pos, const in vec2 scale, const in vec2 factors, const int octaves, const in vec4 shifts, const in float gain, const in float lacunarity, const in float slopeness, 
+// @param scale Number of tiles, must be  integer for tileable results, range: [2, inf]
+// @param factors Controls the warp Q and R factors, range: [-1, 1], default: vec2(1.0, 1.0)
+// @param octaves Number of octaves for the fbm, range: [1, inf]
+// @param shifts Shift or seed values for the Q and R domain warp factors, range: [0, inf]
+// @param gain Gain for each fbm octave, range: [0, 2], default: 0.5
+// @param lacunarity Frequency of the fbm, must be integer for tileable results, range: [1, 32]
+// @param slopeness Slope intensity of the derivatives, range: [0, 1], default: 0.5
+// @param phase Phase to rotated the noise gradients, range: [0, PI]
+// @param negative If true use a negative range for the noise values, range: [false, true]
+// @param seed Seed to randomize result, range: [0, inf], default: 0.0
+float fbmWarp(vec2 pos, vec2 scale, vec2 factors, int octaves, vec4 shifts, float timeShift, float gain, vec2 lacunarity, float slopeness, float octaveFactor, bool negative, float seed,
               out vec2 q, out vec2 r) 
 {
     // domain warping with factal sum value noise
 
     float qfactor = factors.x;
     float rfactor = factors.y;
-    
-    q.x = fbmd(pos, scale, octaves, 0.0, gain, lacunarity, slopeness);
-    q.y = fbmd(pos, scale, octaves, shifts.x, gain, lacunarity, slopeness);
+    q.x = fbmd(pos, scale, octaves, vec2(0.0), timeShift, gain, lacunarity, slopeness, octaveFactor, seed).x;
+    q.y = fbmd(pos, scale, octaves, vec2(shifts.x), timeShift, gain, lacunarity, slopeness, octaveFactor, seed).x;
+    q = negative ? q * 2.0 - 1.0 : q;
     
     vec2 np = pos + qfactor * q;
-    r.x = fbmd(np, scale, octaves, shifts.y, gain, lacunarity, slopeness);
-    r.y = fbmd(np, scale, octaves, shifts.z, gain, lacunarity, slopeness);
-    
-    return fbmd(pos + r * rfactor, scale, octaves, shifts.w, gain, lacunarity, slopeness);
+    r.x = fbmd(np, scale, octaves, vec2(shifts.y), timeShift, gain, lacunarity, slopeness, octaveFactor, seed).x;
+    r.y = fbmd(np, scale, octaves, vec2(shifts.z), timeShift, gain, lacunarity, slopeness, octaveFactor, seed).x;
+    r = negative ? r * 2.0 - 1.0 : r;
+
+    return fbmd(pos + r * rfactor, scale, octaves, vec2(shifts.w), timeShift, gain, lacunarity, slopeness, octaveFactor, seed).x;
 }
 
-float curlWarp(const in vec2 pos, const in vec2 scale, const vec2 factors, const in vec4 seeds, const in float curl,
+// @param scale Number of tiles, must be  integer for tileable results, range: [2, inf]
+// @param factors Controls the warp Q and R factors, range: [-1, 1], default: vec2(1.0, 1.0)
+// @param octaves Number of octaves for the fbm, range: [1, inf]
+// @param shifts Shift or seed values for the Q and R domain warp factors, range: [0, inf]
+// @param gain Gain for each fbm octave, range: [0, 2], default: 0.5
+// @param lacunarity Frequency of the fbm, must be integer for tileable results, range: [1, 32]
+// @param slopeness Slope intensity of the derivatives, range: [0, 1], default: 0.5
+// @param phase Phase to rotated the noise gradients, range: [0, PI]
+// @param negative If true use a negative range for the noise values, range: [false, true]
+// @param seed Seed to randomize result, range: [0, inf], default: 0.0
+float fbmPerlinWarp(vec2 pos, vec2 scale, vec2 factors, int octaves, vec4 shifts, float timeShift, float gain, vec2 lacunarity, float slopeness, float octaveFactor, bool negative, float seed,
+                      out vec2 q, out vec2 r) 
+{
+    // domain warping with factal sum value noise
+
+    float qfactor = factors.x;
+    float rfactor = factors.y;
+    q.x = fbmdPerlin(pos, scale, octaves, vec2(0.0), timeShift, gain, lacunarity, slopeness, octaveFactor, negative).x;
+    q.y = fbmdPerlin(pos, scale, octaves, vec2(shifts.x), timeShift, gain, lacunarity, slopeness, octaveFactor, negative).x;
+    
+    vec2 np = pos + qfactor * q;
+    r.x = fbmdPerlin(np, scale, octaves, vec2(shifts.y), timeShift, gain, lacunarity, slopeness, octaveFactor, negative).x;
+    r.y = fbmdPerlin(np, scale, octaves, vec2(shifts.z), timeShift, gain, lacunarity, slopeness, octaveFactor, negative).x;
+    
+    return fbmdPerlin(pos + r * rfactor, scale, octaves, vec2(shifts.w), timeShift, gain, lacunarity, slopeness, octaveFactor, negative).x;
+}
+
+// @param factors Controls the warp Q and R factors, range: [-1, 1], default: vec2(1.0, 1.0)
+// @param seeds Seeds for the Q and R domain warp factors, range: [-inf, inf]
+// @param curl Curl or bend of the noise, range: [0, 1], default: 0.5
+// @param seed Seed to randomize result, range: [0, inf], default: 0.0
+float curlWarp(vec2 pos, vec2 scale, vec2 factors, vec4 seeds, float curl, float seed,
                out vec2 q, out vec2 r)
 {
     float qfactor = factors.x;
     float rfactor = factors.y;
     vec2 curlFactor = vec2(1.0, -1.0) * vec2(curl, 1.0 - curl);
     
-    vec2 n = gradientNoised(pos, scale).zy * curlFactor;
+    vec2 n = gradientNoised(pos, scale, seed).zy * curlFactor;
     q.x = n.x + n.y;
-    n = gradientNoised(pos + hash2d(seeds.x), scale).zy * curlFactor;
+    n = gradientNoised(pos + hash2D(seeds.x), scale, seed).zy * curlFactor;
     q.x = n.x + n.y;
     
     vec2 np = pos + qfactor * q;
-    n = gradientNoised(np + hash2d(seeds.y), scale).zy * curlFactor;
+    n = gradientNoised(np + hash2D(seeds.y), scale, seed).zy * curlFactor;
     r.x = n.x + n.y;
-    n = gradientNoised(np + hash2d(seeds.z), scale).zy * curlFactor;
+    n = gradientNoised(np + hash2D(seeds.z), scale, seed).zy * curlFactor;
     r.y = n.x + n.y;
 
-    return gradientNoise(pos + r * rfactor + hash2d(seeds.w), scale);
+    return perlinNoise(pos + r * rfactor + hash2D(seeds.w), scale);
+}
+
+// @param scale Number of tiles, must be  integer for tileable results, range: [2, inf]
+// @param strength Controls the warp strength, range: [-1, 1]
+// @param phase Noise phase, range: [-inf, inf]
+// @param spread The gradient spread, range: [0.001, inf], default: 0.001
+// @param factor Pow intensity factor, range: [0, 10]
+float perlinNoiseWarp(vec2 pos, vec2 scale, float strength, float phase, float factor, float spread, float seed)
+{
+    vec2 offset = vec2(spread, 0.0);
+    strength *= 32.0 / max(scale.x, scale.y);
+    
+    vec4 gp;
+    gp.x = perlinNoise(pos - offset.xy, scale, phase, seed);
+    gp.y = perlinNoise(pos + offset.xy, scale, phase, seed);
+    gp.z = perlinNoise(pos - offset.yx, scale, phase, seed);
+    gp.w = perlinNoise(pos + offset.yx, scale, phase, seed);
+    gp = pow(gp, vec4(factor));
+    vec2 warp = vec2(gp.y - gp.x, gp.w - gp.z);
+    return pow(perlinNoise(pos + warp * strength, scale, phase, seed), factor);
 }
