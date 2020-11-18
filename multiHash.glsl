@@ -26,7 +26,7 @@ vec2 betterHash2D(vec2 x)
 {
     uvec2 q = uvec2(x);
     uint h0 = ihash1D(ihash1D(q.x) + q.y);
-    uint h1 = ihash1D(h0 ^ 1933247u);
+    uint h1 = h0 * 1933247u + ~h0 ^ 230123u;
     return vec2(h0, h1)  * (1.0 / float(0xffffffffu));
 }
 
