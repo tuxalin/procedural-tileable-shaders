@@ -23,7 +23,7 @@ vec2 cellularNoise(vec2 pos, vec2 scale, float jitter, float seed)
     vec4 d0 = dx0 * dx0 + dy0 * dy0; 
     vec4 d1 = dx1 * dx1 + dy1 * dy1; 
     
-    vec2 centerPos = hash2D(i) * jitter - f; // 0 0
+    vec2 centerPos = multiHash2D(i) * jitter - f; // 0 0
     
     vec4 F = min(d0, d1);
     // shuffle into F the 4 lowest values
@@ -71,7 +71,7 @@ vec2 cellularNoise(vec2 pos, vec2 scale, float jitter, float phase, float seed)
     vec4 d0 = dx0 * dx0 + dy0 * dy0; 
     vec4 d1 = dx1 * dx1 + dy1 * dy1; 
     
-    vec2 centerPos = (0.5 * sin(phase + kPI2 *  hash2D(i)) + 0.5) * jitter - f; // 0 0
+    vec2 centerPos = (0.5 * sin(phase + kPI2 * multiHash2D(i)) + 0.5) * jitter - f; // 0 0
     vec4 F = min(d0, d1);
     // shuffle into F the 4 lowest values
     F = min(F, max(d0, d1).wzyx);
@@ -119,7 +119,7 @@ vec2 cellularNoise(vec2 pos, vec2 scale, float jitter, float phase, uint metric,
     vec4 d0 = distanceMetric(dx0, dy0, metric);
     vec4 d1 = distanceMetric(dx1, dy1, metric);
     
-    vec2 centerPos = (0.5 * sin(phase + kPI2 *  hash2D(i)) + 0.5) * jitter - f; // 0 0
+    vec2 centerPos = (0.5 * sin(phase + kPI2 * multiHash2D(i)) + 0.5) * jitter - f; // 0 0
     vec4 F = min(d0, d1);
     // shuffle into F the 4 lowest values
     F = min(F, max(d0, d1).wzyx);
@@ -160,7 +160,7 @@ vec3 cellularNoised(vec2 pos, vec2 scale, float jitter, float seed)
     vec4 d0 = dx0 * dx0 + dy0 * dy0; 
     vec4 d1 = dx1 * dx1 + dy1 * dy1; 
     
-    vec2 centerPos = hash2D(i) * jitter - f; // 0 0
+    vec2 centerPos = multiHash2D(i) * jitter - f; // 0 0
     float dCenter = dot(centerPos, centerPos);
     vec4 d = min(d0, d1);
     vec4 less = step(d1, d0);
@@ -207,7 +207,7 @@ vec3 cellularNoised(vec2 pos, vec2 scale, float jitter, float phase, float seed)
     vec4 d0 = dx0 * dx0 + dy0 * dy0; 
     vec4 d1 = dx1 * dx1 + dy1 * dy1; 
     
-    vec2 centerPos = (0.5 * sin(phase + kPI2 *  hash2D(i)) + 0.5) * jitter - f; // 0 0
+    vec2 centerPos = (0.5 * sin(phase + kPI2 * multiHash2D(i)) + 0.5) * jitter - f; // 0 0
     float dCenter = dot(centerPos, centerPos);
     vec4 d = min(d0, d1);
     vec4 less = step(d1, d0);
@@ -247,7 +247,7 @@ float metaballs(vec2 pos, vec2 scale, float jitter, float seed)
     vec4 d0 = dx0 * dx0 + dy0 * dy0; 
     vec4 d1 = dx1 * dx1 + dy1 * dy1; 
     
-    vec2 centerPos = hash2D(i) * jitter - f; // 0 0
+    vec2 centerPos = multiHash2D(i) * jitter - f; // 0 0
     
     float d = min(1.0, dot(centerPos, centerPos));
     d = min(d, d * d0.x);
@@ -298,7 +298,7 @@ float metaballs(vec2 pos, vec2 scale, float jitter, float phase, float seed)
     vec4 d0 = dx0 * dx0 + dy0 * dy0; 
     vec4 d1 = dx1 * dx1 + dy1 * dy1; 
     
-    vec2 centerPos = (0.5 * sin(phase + kPI2 *  hash2D(i)) + 0.5) * jitter - f; // 0 0
+    vec2 centerPos = (0.5 * sin(phase + kPI2 * multiHash2D(i)) + 0.5) * jitter - f; // 0 0
     
     float d = min(1.0, dot(centerPos, centerPos));
     d = min(d, d * d0.x);
@@ -350,7 +350,7 @@ float metaballs(vec2 pos, vec2 scale, float jitter, float phase, uint metric, fl
     vec4 d0 = distanceMetric(dx0, dy0, metric);
     vec4 d1 = distanceMetric(dx1, dy1, metric);
     
-    vec2 centerPos = (0.5 * sin(phase + kPI2 *  hash2D(i)) + 0.5) * jitter - f; // 0 0
+    vec2 centerPos = (0.5 * sin(phase + kPI2 * multiHash2D(i)) + 0.5) * jitter - f; // 0 0
     
     float d = min(1.0, distanceMetric(centerPos, metric));
     d = min(d, d * d0.x);

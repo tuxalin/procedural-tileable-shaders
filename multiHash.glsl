@@ -21,6 +21,15 @@ void permuteHash2D(vec4 cell, out vec4 hashX, out vec4 hashY)
     hashX = permuteResolve(hashX);
 }
 
+// generates 2 random numbers for the coordinate
+vec2 betterHash2D(vec2 x)
+{
+    uvec2 q = uvec2(x);
+    uint h0 = ihash1D(ihash1D(q.x) + q.y);
+    uint h1 = ihash1D(h0 ^ 1933247u);
+    return vec2(h0, h1)  * (1.0 / float(0xffffffffu));
+}
+
 // generates a random number for each of the 4 cell corners
 vec4 betterHash2D(vec4 cell)    
 {
@@ -39,13 +48,14 @@ void betterHash2D(vec4 cell, out vec4 hashX, out vec4 hashY)
     hashY = vec4(hash1) * (1.0 / float(0xffffffffu));
 }
 
+// generates 2 random numbers for each of the four 2D coordinates
 void betterHash2D(vec4 coords0, vec4 coords1, out vec4 hashX, out vec4 hashY)
 {
-    vec4 hash0 = hash2D(coords0.xy, coords0.zw);
-    vec4 hash1 = hash2D(coords1.xy, coords1.zw);
-    hashX = vec4(hash0.xz, hash1.xz);
-    hashY = vec4(hash0.yw, hash1.yw);
-}
+    uvec4 hash0 = ihash1D(ihash1D(uvec4(coords0.xz, coords1.xz)) + uvec4(coords0.yw, coords1.yw));
+    uvec4 hash1 = hash0 * 1933247u + ~hash0 ^ 230123u;
+    hashX = vec4(hash0) * (1.0 / float(0xffffffffu));
+    hashY = vec4(hash1) * (1.0 / float(0xffffffffu));
+} 
 
 // 3D
 
