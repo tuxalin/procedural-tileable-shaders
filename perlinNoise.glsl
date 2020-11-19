@@ -47,14 +47,14 @@ float perlinNoise(vec2 pos, vec2 scale, mat2 transform, float seed)
     gradientY -= 0.49999;
 
     // transform gradients
-    vec4 m = vec4(transform);
+    vec4 mt = vec4(transform);
     vec4 rg = vec4(gradientX.x, gradientY.x, gradientX.y, gradientY.y);
-    rg = rg.xxzz * m.xyxy + rg.yyww * m.zwzw;
+    rg = rg.xxzz * mt.xyxy + rg.yyww * mt.zwzw;
     gradientX.xy = rg.xz;
     gradientY.xy = rg.yw;
 
     rg = vec4(gradientX.z, gradientY.z, gradientX.w, gradientY.w);
-    rg = rg.xxzz * m.xyxy + rg.yyww * m.zwzw;
+    rg = rg.xxzz * mt.xyxy + rg.yyww * mt.zwzw;
     gradientX.zw = rg.xz;
     gradientY.zw = rg.yw;
 
@@ -131,14 +131,14 @@ vec3 perlinNoised(vec2 pos, vec2 scale, mat2 transform, float seed)
     gradientY -= 0.49999;
 
     // transform gradients
-    vec4 m = vec4(transform);
+    vec4 mt = vec4(transform);
     vec4 rg = vec4(gradientX.x, gradientY.x, gradientX.y, gradientY.y);
-    rg = rg.xxzz * m.xyxy + rg.yyww * m.zwzw;
+    rg = rg.xxzz * mt.xyxy + rg.yyww * mt.zwzw;
     gradientX.xy = rg.xz;
     gradientY.xy = rg.yw;
 
     rg = vec4(gradientX.z, gradientY.z, gradientX.w, gradientY.w);
-    rg = rg.xxzz * m.xyxy + rg.yyww * m.zwzw;
+    rg = rg.xxzz * mt.xyxy + rg.yyww * mt.zwzw;
     gradientX.zw = rg.xz;
     gradientY.zw = rg.yw;
 
