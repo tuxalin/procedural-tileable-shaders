@@ -1,3 +1,42 @@
+vec3 checkerboard(const in vec2 pos, const in vec2 scale, const in vec2 smoothness)
+{
+    // based on filtering the checkerboard by Inigo Quilez 
+    vec2 numTiles = floor(scale); 
+    vec2 p = pos * numTiles * 2.0;
+    vec2 tile = mod(floor(p), numTiles);
+    
+    vec2 w = smoothness;
+    // box filter using triangular signal
+    vec2 s1 = abs(fract((p - 0.5 * w) / 2.0) - 0.5);
+    vec2 s2 = abs(fract((p + 0.5 * w) / 2.0) - 0.5);
+    vec2 i = 2.0 * (s1 - s2) / w;
+    float d = 0.5 - 0.5 * i.x * i.y; // xor pattern
+    return vec3(d, tile);
+}
+
+vec3 checkerboard45(const in vec2 pos, const in vec2 scale, const in vec2 smoothness)
+{
+    // based on filtering the checkerboard by Inigo Quilez 
+    const float sqrtOfTwo = 1.41421356237;
+    
+    vec2 numTiles = floor(scale); 
+    vec2 p = pos * numTiles * 2.0;
+    
+    const mat2 rotate45 = mat2(0.70710678119, 0.70710678119, -0.70710678119, 0.70710678119);
+    p *= 1.0 / sqrtOfTwo;
+    p.x += sqrtOfTwo * 0.5;
+    p = p * rotate45;
+
+    vec2 w = max(smoothness, vec2(0.001));
+    // box filter using triangular signal
+    vec2 s1 = abs(fract((p - 0.5 * w) / 2.0) - 0.5);
+    vec2 s2 = abs(fract((p + 0.5 * w) / 2.0) - 0.5);
+    vec2 i = 2.0 * (s1 - s2) / w;
+    float d = 0.5 - 0.5 * i.x * i.y; // xor pattern
+    vec2 tile = mod(floor(p), numTiles);
+    return vec3(d, tile);
+}
+
 float triangleWave(float x) 
 {
     const float pi = 3.141592;
