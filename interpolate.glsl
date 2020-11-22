@@ -1,5 +1,5 @@
 
-// the main noise interpolation function using a hermite polynomical
+// the main noise interpolation function using a hermite polynomial
 float noiseInterpolate(const in float x) 
 { 
     float x2 = x * x;
@@ -13,6 +13,11 @@ vec2 noiseInterpolate(const in vec2 x)
 vec3 noiseInterpolate(const in vec3 x) 
 { 
     vec3 x2 = x * x;
+    return x2 * x * (x * (x * 6.0 - 15.0) + 10.0); 
+}
+vec4 noiseInterpolate(const in vec4 x) 
+{ 
+    vec4 x2 = x * x;
     return x2 * x * (x * (x * 6.0 - 15.0) + 10.0); 
 }
 vec4 noiseInterpolateDu(const in vec2 x) 
