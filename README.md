@@ -18,7 +18,8 @@ Collection of tileable procedural textures:
 ### Classic Noise
 
 Value Noise:
-![value-noise](screenshots/value-noise.png)![value-noise-deriv](screenshots/value-noise-deriv.png)
+![value-noise](screenshots/value-noise.png)
+![value-noise-deriv](screenshots/value-noise-deriv.png)
 
 ### Worley Noise
 
