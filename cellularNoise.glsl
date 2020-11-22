@@ -233,6 +233,7 @@ float metaballs(vec2 pos, vec2 scale, float jitter, float seed)
     pos *= scale;
     vec2 i = floor(pos);
     vec2 f = pos - i;
+    i = mod(i, scale) + seed;
     
     const vec3 offset = vec3(-1.0, 0.0, 1.0);
     vec4 cells = mod(i.xyxy + offset.xxzz, scale.xyxy);
@@ -280,6 +281,7 @@ float metaballs(vec2 pos, vec2 scale, float jitter, float phase, float seed)
     pos *= scale;
     vec2 i = floor(pos);
     vec2 f = pos - i;
+    i = mod(i, scale) + seed;
     
     const vec3 offset = vec3(-1.0, 0.0, 1.0);
     vec4 cells = mod(i.xyxy + offset.xxzz, scale.xyxy);
@@ -332,6 +334,7 @@ float metaballs(vec2 pos, vec2 scale, float jitter, float phase, uint metric, fl
     pos *= scale;
     vec2 i = floor(pos);
     vec2 f = pos - i;
+    i = mod(i, scale) + seed;
     
     const vec3 offset = vec3(-1.0, 0.0, 1.0);
     vec4 cells = mod(i.xyxy + offset.xxzz, scale.xyxy);
