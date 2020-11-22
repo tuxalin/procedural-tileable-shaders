@@ -3,9 +3,9 @@ vec3 checkerboard(const in vec2 pos, const in vec2 scale, const in vec2 smoothne
     // based on filtering the checkerboard by Inigo Quilez 
     vec2 numTiles = floor(scale); 
     vec2 p = pos * numTiles * 2.0;
-    vec2 tile = mod(floor(p), numTiles);
+    vec2 tile = mod(floor(p), numTiles * 2.0);
     
-    vec2 w = smoothness;
+    vec2 w = max(smoothness, vec2(0.001));
     // box filter using triangular signal
     vec2 s1 = abs(fract((p - 0.5 * w) / 2.0) - 0.5);
     vec2 s2 = abs(fract((p + 0.5 * w) / 2.0) - 0.5);

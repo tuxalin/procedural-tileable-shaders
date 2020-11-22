@@ -169,9 +169,9 @@ vec3 perlinNoised(vec2 pos, vec2 scale, float rotation, float seed)
 
 // 2D Variant of Perlin noise that produces and organic-like noise.
 // @param scale Number of tiles, must be  integer for tileable results, range: [2, inf]
-// @param density The density of the lower frequency details, range: [0, 1], default: 0.5
+// @param density The density of the lower frequency details, range: [0, 1], default: 1.0
 // @param phase The phase of the noise, range: [-inf, inf], default: {0, 0}
-// @param contrast Controls the contrast of the result, range: [0, 1], default: 0.5
+// @param contrast Controls the contrast of the result, range: [0, 1], default: 0.0
 // @param highlights Controls the highlights of the , range: [0, 1], default: 0.25
 // @param shift Shifts the angle of the highlights, range: [0, 1], default: 0.5
 // @param seed Seed to randomize result, range: [0, inf], default: 0.0

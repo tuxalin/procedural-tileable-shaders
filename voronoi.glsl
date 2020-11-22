@@ -48,7 +48,7 @@ vec3 voronoi(vec2 pos, vec2 scale, float jitter, float phase, float seed)
             
             vec2 v = minPos - rPos;
             if(dot(v, v) > 1e-5)
-                minDistance = min(minDistance, dot( 0.5 * (minPos + rPos), normalize(rPos - minPos)));
+                minDistance = min(minDistance, dot(0.5 * (minPos + rPos), normalize(rPos - minPos)));
         }
     }
 

@@ -250,7 +250,7 @@ vec3 dotsNoise(vec2 pos, vec2 scale, float density, float size, float sizeVariat
     vec2 f = pos - i.xy;
     i = mod(i, scale.xyxy);
     
-    vec4 hash = hash4d(i + seed);
+    vec4 hash = hash4D(i.xy + seed);
     if (hash.w > density)
         return vec3(0.0);
 
