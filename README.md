@@ -17,10 +17,13 @@ Collection of tileable procedural textures:
 
 ### Classic Noise
 
-Value Noise:
-![value-noise](screenshots/value_noise.png)![value-noise-deriv](screenshots/value_noise_deriv.png)
+#### Random, Value Noise, Value Noise Derivatives and Grid Noise
+![value-noise](screenshots/preview_value_noise.png)
 
 ### Worley Noise
+
+#### Cellular Noise F1, Cellular Noise F2, Metaballs and Cellular Noise Derivatives
+![value-noise](screenshots/preview_cellular.png)
 
 ### FBM
 
