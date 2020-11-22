@@ -17,7 +17,7 @@ Collection of tileable procedural textures:
 
 ### Classic Noise
 
-#### Random, Value Noise, Value Noise Derivatives and Grid Noise
+#### Random, Value Noise, Value Noise Derivatives and Grid Noise variant
 ![value-noise](screenshots/preview_value_noise.png)
 
 #### Gradient Noise (Derivatives and configurable Disorder)
@@ -31,6 +31,9 @@ Collection of tileable procedural textures:
 #### Cellular Noise metrics (Manhattan, Chebyshev and Triangular)
 ![cellular-noise-metrics](screenshots/preview_cellular_metrics.png)
 
+#### Voronoi (minimum edge distance, Cracks, random pattern and IDs)
+![preview_voronoi](screenshots/preview_voronoi.png)
+
 ### FBM
 
 ### Domain warp
@@ -38,7 +41,13 @@ Collection of tileable procedural textures:
 ### Patterns
 
 #### Checkerboard (plus 45 angle), Random Lines and Dots  
-![cellular-noise](screenshots/preview_patterns0.png)
+![preview_patterns_0](screenshots/preview_patterns_0.png)
+
+#### Metaballs, Line Waves, Stairs and Cross Pattern
+![preview_patterns_1](screenshots/preview_patterns_1.png)
+
+#### Tile weaves with normal
+![preview_tile_weaves](screenshots/preview_tile_weaves.png)
 
 ## Contributing
 
