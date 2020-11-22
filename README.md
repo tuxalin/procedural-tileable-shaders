@@ -20,16 +20,25 @@ Collection of tileable procedural textures:
 #### Random, Value Noise, Value Noise Derivatives and Grid Noise
 ![value-noise](screenshots/preview_value_noise.png)
 
+#### Gradient Noise (Derivatives and configurable Disorder)
+![gradient-noise](screenshots/preview_gradient_noise.png)
+
 ### Worley Noise
 
-#### Cellular Noise F1, Cellular Noise F2, Metaballs and Cellular Noise Derivatives
-![value-noise](screenshots/preview_cellular.png)
+#### Cellular Noise (F1 and F2), Metaballs and Cellular Noise Derivatives
+![cellular-noise](screenshots/preview_cellular.png)
+
+#### Cellular Noise metrics (Manhattan, Chebyshev and Triangular)
+![cellular-noise-metrics](screenshots/preview_cellular_metrics.png)
 
 ### FBM
 
 ### Domain warp
 
 ### Patterns
+
+#### Checkerboard (plus 45 angle), Random Lines and Dots  
+![cellular-noise](screenshots/preview_patterns0.png)
 
 ## Contributing
 
