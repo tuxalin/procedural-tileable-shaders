@@ -87,6 +87,7 @@ float stairsPattern(vec2 pos, vec2 scale, float width, float smoothness, float d
 
 float sdfLens(vec2 p, float width, float height)
 {
+    // Vesica SDF based on Inigo Quilez
     float d = height / width - width / 4.0;
     float r = width / 2.0 + d;
     
@@ -106,10 +107,42 @@ vec3 tileWeave(vec2 pos, vec2 scale, float count, float width, float smoothness)
     p = mix(p.st, p.ts, c);
     p = fract(p * vec2(count, 1.0));
     
-    // Vesica SDF based on Inigo Quilez
     width *= 2.0;
     p = p * 2.0 - 1.0;
     float d = sdfLens(p, width, 1.0);
+    vec2 grad = vec2(dFdx(d), dFdy(d));
+
+    float s = 1.0 - smoothstep(0.0, dot(abs(grad), vec2(1.0)) + smoothness, -d);
+    return vec3(s, normalize(grad) * smoothstep(1.0, 0.99, s) * smoothstep(0.0, 0.01, s)); 
+}
+
+float sdfCapsule(vec2 p, float radiusA, float radiusB, float height)
+{
+    // Capsule SDF based on Inigo Quilez
+    p.x = abs(p.x);
+    p.y += height * 0.5;
+    
+    float b = (radiusA - radiusB) / height;
+    vec2 c = vec2(sqrt(1.0 - b * b), b);
+    vec3 mnk = vec3(c.x, p.x, c.x) * p.xxy + vec3(c.y, p.y, -c.y) * p.yyx;
+    
+    if( mnk.z < 0.0   ) 
+        return sqrt(mnk.y) - radiusA;
+    else if(mnk.z > c.x * height) 
+        return sqrt(mnk.y + height * height - 2.0 * height * p.y) - radiusB;
+    return mnk.x - radiusA;
+}
+vec3 tileWeave(vec2 pos, vec2 scale, float count, vec2 width, float smoothness)
+{
+    vec2 i = floor(pos * scale);    
+    float c = mod(i.x + i.y, 2.0);
+    
+    vec2 p = fract(pos.st * scale);
+    p = mix(p.st, p.ts, c);
+    p = fract(p * vec2(count, 1.0));
+    
+    p = p * 2.0 - 1.0;
+    float d = sdfCapsule(p, width.x, width.y, 1.0 - max(width.x, width.y) * 0.75);
     vec2 grad = vec2(dFdx(d), dFdy(d));
 
     float s = 1.0 - smoothstep(0.0, dot(abs(grad), vec2(1.0)) + smoothness, -d);

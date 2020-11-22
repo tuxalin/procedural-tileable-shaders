@@ -46,7 +46,7 @@ Collection of tileable procedural textures:
 #### Metaballs, Line Waves, Stairs and Cross Pattern
 ![preview_patterns_1](screenshots/preview_patterns_1.png)
 
-#### Tile weaves with normal
+#### Tile weaves with normal (Vesica and Capsule)
 ![preview_tile_weaves](screenshots/preview_tile_weaves.png)
 
 ## Contributing
