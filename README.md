@@ -64,6 +64,8 @@ Collection of tileable procedural textures:
 #### Warping of FBMs (Value noise, Negative Value Noise, Perlin Noise and QR warping)
 ![warp-fbms](screenshots/preview_warp_fbms.png)
 
+Functions: fbmWarp and fbmPerlinWarp.
+
 #### Q and R factors
 
 The Q and R values of the warp can be used to mix different patterns/colors:
@@ -81,6 +83,8 @@ The Q and R values of the warp can be used to mix different patterns/colors:
 
 #### Warping variants of Perlin Noise (using dervatives and curl)
 ![warp-perlin](screenshots/preview_warp_perlin.png)
+
+Functions: perlinNoiseWarp and curlWarp.
 
 ## Contributing
 
