@@ -30,14 +30,14 @@ Functions: gradientNoise, gradientNoised and gradientNoiseDisorder.
 #### Perlin Noise (Derivatives and variant)
 ![perlin-noise](screenshots/preview_perlin_noise.png)
 
-Functions: perlinNoise, organicNoise and perlinNoised.
+Functions: perlinNoise, perlinNoised and organicNoise.
 
 ### Worley Noise
 
 #### Cellular Noise (F1 and F2), Metaballs and Cellular Noise Derivatives
 ![cellular-noise](screenshots/preview_cellular.png)
 
-Functions: cellularNoise, metaballs and cellularNoised.
+Functions: cellularNoise (F1), cellularNoise (F2), metaballs and cellularNoised.
 
 #### Cellular Noise metrics (Manhattan, Chebyshev and Triangular)
 ![cellular-noise-metrics](screenshots/preview_cellular_metrics.png)
@@ -47,7 +47,7 @@ Functions: cellularNoise.
 #### Voronoi (minimum edge distance, Cracks, random pattern and IDs)
 ![preview_voronoi](screenshots/preview_voronoi.png)
 
-Functions: voronoi, voronoiPattern and cracks.
+Functions: voronoi, cracks, voronoiPattern and voronoi (tile position of the cell).
 
 ### Patterns
 
@@ -71,7 +71,7 @@ Functions: tileWeave.
 #### Value Noise, Perlin Noise, Grid Noise and Metaballs 
 ![fbms](screenshots/preview_fbms.png)
 
-Functions: fbm, fbmPerlin (mode == 4u)  and fbmGrid, fbmMetaballs.
+Functions: fbm, fbmPerlin (mode == 4u), fbmGrid and fbmMetaballs.
 
 #### Sloped FBMs with derivatives (Value and Perlin)
 ![fbm-sloped](screenshots/preview_fbm_sloped.png)
@@ -81,7 +81,13 @@ Functions: fbmd and fbmdPerlin.
 #### Perlin FBMs (Ridge Multiply, Ridge Add, Perlin Multiply and Perlin Add)
 ![fbm-perlin](screenshots/preview_fbm_perlin.png)
 
-Functions: fbmPerlin.
+Functions: fbmPerlin (mode: 0u, 1u, 2u, 3u).
+
+#### Image FBMs with derivatives (can be used with image inputs, both grayscale and color)
+
+![fbm-image](screenshots/preview_fbm_image.png)
+
+Functions: fbmImage and fbmGrayscaleImaged.
 
 ### Domain warp
 

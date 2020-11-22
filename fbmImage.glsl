@@ -44,7 +44,8 @@ vec2 grayscaleSobel(sampler2D tex, vec2 uv, float spread)
 // @param lacunarity Frequency of the fbm, must be integer for tileable results, range: [1, 32]
 // @param slopeness Slope intensity of the derivatives, range: [0, 1], default: 0.5
 // @param spread Spread for the derivatives, range: [1, 16], default: 1.0
-vec3 fbmImage(sampler2D tex, vec2 uv, vec2 scale, uint octaves, float shift, float axialShift, float gain, float lacunarity, float slopeness, float spread)
+// @param octaveFactor The octave intensity factor, the lower the more pronounced the lower octaves will be, range: [-1, 1], default: 0.0
+vec3 fbmImage(sampler2D tex, vec2 uv, vec2 scale, uint octaves, float shift, float axialShift, float gain, float lacunarity, float slopeness, float spread, float octaveFactor)
 {
     // based on derivative fbm by Inigo Quilez
     vec3 value = vec3(0.0);
@@ -52,25 +53,27 @@ vec3 fbmImage(sampler2D tex, vec2 uv, vec2 scale, uint octaves, float shift, flo
     
     float amplitude = gain;
     vec2 frequency = floor(scale);
+    vec2 offset = vec2(shift, 0.0);
     float angle = 0.0;
-    axialShift =  3.1415926 * 0.5 * floor(float(octaves) * axialShift);
+    axialShift = 3.1415926 * 0.5 * floor(float(octaves) * axialShift);
+    octaveFactor = 1.0 + octaveFactor * 0.12;
+    
+    vec2 sinCos = vec2(sin(axialShift), cos(axialShift));
+    mat2 rotate = mat2(sinCos.y, sinCos.x, sinCos.x, sinCos.y);
 
     vec2 p = uv * frequency;
     for (uint i = 0u; i < octaves; i++)
     {
-        vec2 sinCos = vec2(sin(angle), cos(angle));
-        mat2 rotate = mat2(sinCos.y, -sinCos.x, sinCos.x, sinCos.y); 
-
-        vec2 coord = rotate * p;
-        vec3 color = texture(tex, coord).rgb;
-        vec2 grad = sobel(tex, coord, spread);
+        vec3 color = texture(tex, p).rgb;
+        vec2 grad = sobel(tex, p, spread);
         derivative += grad;
         value += amplitude * color / (1.0 + mix(0.0, dot(derivative, derivative), slopeness));
 
-        amplitude *= gain;
-        p = p * lacunarity + shift;
+        amplitude = pow(amplitude * gain, octaveFactor);
+        p = (p * lacunarity + offset) * rotate;
         frequency *= lacunarity;
         angle += axialShift;
+        offset *= rotate;
     }
     return value;
 }
@@ -83,32 +86,35 @@ vec3 fbmImage(sampler2D tex, vec2 uv, vec2 scale, uint octaves, float shift, flo
 // @param lacunarity Frequency of the fbm, must be integer for tileable results, range: [1, 32]
 // @param slopeness Slope intensity of the derivatives, range: [0, 1], default: 0.5
 // @param spread Spread for the derivatives, range: [1, 16], default: 1.0
-vec3 fbmGrayscaleImaged(sampler2D tex, vec2 uv, vec2 scale, uint octaves, float shift, float axialShift, float gain, float lacunarity, float slopeness, float spread)
+// @param octaveFactor The octave intensity factor, the lower the more pronounced the lower octaves will be, range: [-1, 1], default: 0.0
+vec3 fbmGrayscaleImaged(sampler2D tex, vec2 uv, vec2 scale, uint octaves, float shift, float axialShift, float gain, float lacunarity, float slopeness, float spread, float octaveFactor)
 {
     float value = 0.0;
     vec2 derivative = vec2(0.0);
     
     float amplitude = gain;
     vec2 frequency = floor(scale);
+    vec2 offset = vec2(shift, 0.0);
     float angle = 0.0;
-    axialShift =  3.1415926 * 0.5 * floor(float(octaves) * axialShift);
+    axialShift = 3.1415926 * 0.5 * floor(float(octaves) * axialShift);
+    octaveFactor = 1.0 + octaveFactor * 0.12;
+    
+    vec2 sinCos = vec2(sin(axialShift), cos(axialShift));
+    mat2 rotate = mat2(sinCos.y, sinCos.x, sinCos.x, sinCos.y);
 
     vec2 p = uv * frequency;
     for (uint i = 0u; i < octaves; i++)
     {
-        vec2 sinCos = vec2(sin(angle), cos(angle));
-        mat2 rotate = mat2(sinCos.y, -sinCos.x, sinCos.x, sinCos.y); 
-
-        vec2 coord = rotate * p;
-        float lum = texture(tex, coord).r;
-        vec2 grad = grayscaleSobel(tex, coord, spread);
+        float lum = texture(tex, p).r;
+        vec2 grad = grayscaleSobel(tex, p, spread);
         derivative += grad;
         value += amplitude * lum / (1.0 + mix(0.0, dot(derivative, derivative), slopeness));
-
-        amplitude *= gain;
-        p = p * lacunarity + shift;
+        
+        amplitude = pow(amplitude * gain, octaveFactor);
+        p = (p * lacunarity + offset) * rotate;
         frequency *= lacunarity;
         angle += axialShift;
+        offset *= rotate;
     }
     return vec3(value, derivative);
 }
