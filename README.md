@@ -87,7 +87,7 @@ Functions: fbmPerlin (mode: 0u, 1u, 2u, 3u).
 
 ![fbm-image](screenshots/preview_fbm_image.png)
 
-Functions: fbmImage and fbmGrayscaleImaged.
+Functions: fbmGrayscaleImaged and fbmImage.
 
 ### Domain warp
 
