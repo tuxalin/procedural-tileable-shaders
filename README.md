@@ -3,7 +3,8 @@ Collection of tileable procedural textures:
 - value noise (with derivatives and gradient rotation)
 - gradient noise (with derivatives)
 - perlin noise (with gradient rotation)
-- checkers (diagonal)
+- checkerboard (diagonal)
+- patterns: tile weaves, cross, waves, stairs
 - celullar noise
 - metaballs (variant of cellular noise)
 - voronoi (edges, cells)
@@ -13,6 +14,19 @@ Collection of tileable procedural textures:
 ## Preview
 
 [![shadertoy](screenshots/preview.png)](https://www.shadertoy.com/view/3sKXWh)
+
+### Classic Noise
+
+Value Noise:
+![value-noise](screenshots/value-noise.png)![value-noise-deriv](screenshots/value-noise-deriv.png)
+
+### Worley Noise
+
+### FBM
+
+### Domain warp
+
+### Patterns
 
 ## Contributing
 
