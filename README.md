@@ -20,44 +20,68 @@ Collection of tileable procedural textures:
 #### Random, Value Noise, Value Noise Derivatives and Grid Noise variant
 ![value-noise](screenshots/preview_value_noise.png)
 
+Functions: hash3D (from 1D to 4D), noise, noised and gridNoise.
+
 #### Gradient Noise (Derivatives and configurable Disorder)
 ![gradient-noise](screenshots/preview_gradient_noise.png)
 
+Functions: gradientNoise, gradientNoised and gradientNoiseDisorder.
+
 #### Perlin Noise (Derivatives and variant)
 ![perlin-noise](screenshots/preview_perlin_noise.png)
+
+Functions: perlinNoise, organicNoise and perlinNoised.
 
 ### Worley Noise
 
 #### Cellular Noise (F1 and F2), Metaballs and Cellular Noise Derivatives
 ![cellular-noise](screenshots/preview_cellular.png)
 
+Functions: cellularNoise, metaballs and cellularNoised.
+
 #### Cellular Noise metrics (Manhattan, Chebyshev and Triangular)
 ![cellular-noise-metrics](screenshots/preview_cellular_metrics.png)
 
+Functions: cellularNoise.
+
 #### Voronoi (minimum edge distance, Cracks, random pattern and IDs)
 ![preview_voronoi](screenshots/preview_voronoi.png)
+
+Functions: voronoi, voronoiPattern and cracks.
 
 ### Patterns
 
 #### Checkerboard (plus 45 angle), Random Lines and Dots  
 ![preview_patterns_0](screenshots/preview_patterns_0.png)
 
+Functions: checkerboard, checkerboard45, randomLines and dotsNoise.
+
 #### Metaballs, Line Waves, Stairs and Cross Pattern
 ![preview_patterns_1](screenshots/preview_patterns_1.png)
 
+Functions: metaballs, wavePattern, stairsPattern and crossPattern.
+
 #### Tile weaves with normal (Vesica and Capsule)
 ![preview_tile_weaves](screenshots/preview_tile_weaves.png)
+
+Functions: tileWeave.
 
 ### FBM
 
 #### Value Noise, Perlin Noise, Grid Noise and Metaballs 
 ![fbms](screenshots/preview_fbms.png)
 
+Functions: fbm, fbmPerlin (mode == 4u)  and fbmGrid, fbmMetaballs.
+
 #### Sloped FBMs with derivatives (Value and Perlin)
 ![fbm-sloped](screenshots/preview_fbm_sloped.png)
 
+Functions: fbmd and fbmdPerlin.
+
 #### Perlin FBMs (Ridge Multiply, Ridge Add, Perlin Multiply and Perlin Add)
 ![fbm-perlin](screenshots/preview_fbm_perlin.png)
+
+Functions: fbmPerlin.
 
 ### Domain warp
 
@@ -70,7 +94,7 @@ Functions: fbmWarp and fbmPerlinWarp.
 
 The Q and R values of the warp can be used to mix different patterns/colors:
 ```glsl
-	vec2 q, r;
+    vec2 q, r;
     float f = fbmWarp(p, scale, factors, octaves, shifts, phase, gain, vec2(lacunarity), slopeness, 0.0, true, 0.0, q, r);
         
     col = mix(vec3(0.1,0.5,0.8), vec3(0.6,0.6,0.3), clamp((f * f) * 8.0, 0.0, 1.0));
