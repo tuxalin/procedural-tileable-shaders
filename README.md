@@ -5,10 +5,10 @@ Collection of tileable procedural textures:
 - perlin noise (with gradient rotation)
 - checkerboard (diagonal)
 - patterns: tile weaves, cross, waves, stairs
-- celullar noise
+- celullar noise (with derivatives and phase)
 - metaballs (variant of cellular noise)
 - voronoi (edges, cells)
-- fbm (value, perlin, voronoi and derivative)
+- fbms (value, perlin, voronoi and derivative)
 - domain warping (fbnm and gradient curl)
 
 ## Preview
@@ -50,7 +50,7 @@ Collection of tileable procedural textures:
 
 ### FBM
 
-#### Value Noise, Perlin, Grid Noise and Metaballs 
+#### Value Noise, Perlin Noise, Grid Noise and Metaballs 
 ![fbms](screenshots/preview_fbms.png)
 
 #### Sloped FBMs with derivatives (Value and Perlin)
@@ -60,6 +60,27 @@ Collection of tileable procedural textures:
 ![fbm-perlin](screenshots/preview_fbm_perlin.png)
 
 ### Domain warp
+
+#### Warping of FBMs (Value noise, Negative Value Noise, Perlin Noise and QR warping)
+![warp-fbms](screenshots/preview_warp_fbms.png)
+
+#### Q and R factors
+
+The Q and R values of the warp can be used to mix different patterns/colors:
+```glsl
+	vec2 q, r;
+    float f = fbmWarp(p, scale, factors, octaves, shifts, phase, gain, vec2(lacunarity), slopeness, 0.0, true, 0.0, q, r);
+        
+    col = mix(vec3(0.1,0.5,0.8), vec3(0.6,0.6,0.3), clamp((f * f) * 8.0, 0.0, 1.0));
+    col = mix(col, vec3(0.0, 0.1, 0.05), length(q));
+    col = mix(col, vec3(0.8, 0.8, 0.8), r.x);
+    col = mix(col, col * vec3(0.8, 0.4, 0.2), 0.5 * pow(length(r), 4.0));
+``` 
+
+![fbm-warp-factors](screenshots/preview_warp_factors.png)
+
+#### Warping variants of Perlin Noise (using dervatives and curl)
+![warp-perlin](screenshots/preview_warp_perlin.png)
 
 ## Contributing
 
