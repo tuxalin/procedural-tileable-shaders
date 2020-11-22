@@ -1,4 +1,5 @@
 
+// Domain warping using a factal sum of value noise.
 // @param scale Number of tiles, must be  integer for tileable results, range: [2, inf]
 // @param factors Controls the warp Q and R factors, range: [-1, 1], default: vec2(1.0, 1.0)
 // @param octaves Number of octaves for the fbm, range: [1, inf]
@@ -12,8 +13,6 @@
 float fbmWarp(vec2 pos, vec2 scale, vec2 factors, int octaves, vec4 shifts, float timeShift, float gain, vec2 lacunarity, float slopeness, float octaveFactor, bool negative, float seed,
               out vec2 q, out vec2 r) 
 {
-    // domain warping with factal sum value noise
-
     float qfactor = factors.x;
     float rfactor = factors.y;
     q.x = fbmd(pos, scale, octaves, vec2(0.0), timeShift, gain, lacunarity, slopeness, octaveFactor, seed).x;
@@ -28,8 +27,9 @@ float fbmWarp(vec2 pos, vec2 scale, vec2 factors, int octaves, vec4 shifts, floa
     return fbmd(pos + r * rfactor, scale, octaves, vec2(shifts.w), timeShift, gain, lacunarity, slopeness, octaveFactor, seed).x;
 }
 
+// Domain warping using a factal sum of perlin noise.
 // @param scale Number of tiles, must be  integer for tileable results, range: [2, inf]
-// @param factors Controls the warp Q and R factors, range: [-1, 1], default: vec2(1.0, 1.0)
+// @param factors Controls the warp Q and R factors, range: [-1, 1], default: vec2(0.2, 0.2)
 // @param octaves Number of octaves for the fbm, range: [1, inf]
 // @param shifts Shift or seed values for the Q and R domain warp factors, range: [0, inf]
 // @param gain Gain for each fbm octave, range: [0, 2], default: 0.5
@@ -41,20 +41,19 @@ float fbmWarp(vec2 pos, vec2 scale, vec2 factors, int octaves, vec4 shifts, floa
 float fbmPerlinWarp(vec2 pos, vec2 scale, vec2 factors, int octaves, vec4 shifts, float timeShift, float gain, vec2 lacunarity, float slopeness, float octaveFactor, bool negative, float seed,
                       out vec2 q, out vec2 r) 
 {
-    // domain warping with factal sum value noise
-
     float qfactor = factors.x;
     float rfactor = factors.y;
-    q.x = fbmdPerlin(pos, scale, octaves, vec2(0.0), timeShift, gain, lacunarity, slopeness, octaveFactor, negative).x;
-    q.y = fbmdPerlin(pos, scale, octaves, vec2(shifts.x), timeShift, gain, lacunarity, slopeness, octaveFactor, negative).x;
+    q.x = fbmdPerlin(pos, scale, octaves, vec2(0.0), timeShift, gain, lacunarity, slopeness, octaveFactor, negative, seed).x;
+    q.y = fbmdPerlin(pos, scale, octaves, vec2(shifts.x), timeShift, gain, lacunarity, slopeness, octaveFactor, negative, seed).x;
     
     vec2 np = pos + qfactor * q;
-    r.x = fbmdPerlin(np, scale, octaves, vec2(shifts.y), timeShift, gain, lacunarity, slopeness, octaveFactor, negative).x;
-    r.y = fbmdPerlin(np, scale, octaves, vec2(shifts.z), timeShift, gain, lacunarity, slopeness, octaveFactor, negative).x;
+    r.x = fbmdPerlin(np, scale, octaves, vec2(shifts.y), timeShift, gain, lacunarity, slopeness, octaveFactor, negative, seed).x;
+    r.y = fbmdPerlin(np, scale, octaves, vec2(shifts.z), timeShift, gain, lacunarity, slopeness, octaveFactor, negative, seed).x;
     
-    return fbmdPerlin(pos + r * rfactor, scale, octaves, vec2(shifts.w), timeShift, gain, lacunarity, slopeness, octaveFactor, negative).x;
+    return fbmdPerlin(pos + r * rfactor, scale, octaves, vec2(shifts.w), timeShift, gain, lacunarity, slopeness, octaveFactor, negative, seed).x;
 }
 
+// Domain warping using the derivatives of gradient noise.
 // @param factors Controls the warp Q and R factors, range: [-1, 1], default: vec2(1.0, 1.0)
 // @param seeds Seeds for the Q and R domain warp factors, range: [-inf, inf]
 // @param curl Curl or bend of the noise, range: [0, 1], default: 0.5
@@ -80,6 +79,7 @@ float curlWarp(vec2 pos, vec2 scale, vec2 factors, vec4 seeds, float curl, float
     return perlinNoise(pos + r * rfactor + hash2D(seeds.w), scale);
 }
 
+// Domain warping using the derivatives of perlin noise.
 // @param scale Number of tiles, must be  integer for tileable results, range: [2, inf]
 // @param strength Controls the warp strength, range: [-1, 1]
 // @param phase Noise phase, range: [-inf, inf]

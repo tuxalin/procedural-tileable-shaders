@@ -93,7 +93,7 @@ vec3 fbmd(vec2 pos, vec2 scale, int octaves, vec2 shift, float timeShift, float 
 // @param shift Position shift for each octave, range: [0, inf]
 // @param gain Gain for each fbm octave, range: [0, 2], default: 0.5
 // @param lacunarity Frequency of the fbm, must be integer for tileable results, range: [1, 32], default: 2.0
-// @param slopeness Slope intensity of the derivatives, range: [0, 1], default: 0.5
+// @param slopeness Slope intensity of the derivatives, range: [0, 1], default: 0.25
 // @param octaveFactor The octave intensity factor, the lower the more pronounced the lower octaves will be, range: [-1, 1], default: 0.0
 // @param negative If true use a negative range for the noise values, will result in more contrast, range: [false, true]
 // @param seed Seed to randomize result, range: [0, inf], default: 0.0
@@ -142,9 +142,10 @@ vec3 fbmdPerlin(vec2 pos, vec2 scale, int octaves, vec2 shift, float axialShift,
 // @param mode Mode used in combining the noise for the ocatves, range: [0, 5]
 // @param factor Pow intensity factor, range: [0, 10], default: 1.0
 // @param offset Offsets the value of the noise, range: [-1, 1], default: 0.0
+// @param octaveFactor The octave intensity factor, the lower the more pronounced the lower octaves will be, range: [-1, 1], default: 0.0
 // @param seed Seed to randomize result, range: [0, inf], default: 0.0
 // @return value of the noise, range: [0, inf]
-float fbmPerlin(vec2 pos, vec2 scale, int octaves, float shift, float axialShift, float gain, float lacunarity, uint mode, float factor, float offset, float seed) 
+float fbmPerlin(vec2 pos, vec2 scale, int octaves, float shift, float axialShift, float gain, float lacunarity, uint mode, float factor, float offset, float octaveFactor, float seed) 
 {
     float amplitude = gain;
     vec2 frequency = floor(scale);
@@ -186,7 +187,7 @@ float fbmPerlin(vec2 pos, vec2 scale, int octaves, float shift, float axialShift
         
         p = p * lacunarity + shift;
         frequency *= lacunarity;
-        amplitude *= gain;
+        amplitude = pow(amplitude * gain, octaveFactor);
         angle += axialShift;
     }
     return value;
@@ -238,7 +239,7 @@ vec4 fbmVoronoi(vec2 pos, vec2 scale, int octaves, float shift, float timeShift,
 // FBM implementation using a variation of Value noise.
 // @param scale Number of tiles, must be  integer for tileable results, range: [2, inf]
 // @param octaves Number of octaves for the fbm, range: [1, inf]
-// @param shift Position shift for each octave, range: [0, inf]
+// @param shift Position shift for each octave, range: [0, inf], default: 100.0
 // @param timeShift Time shift for each octave, range: [-inf, inf]
 // @param gain Gain for each fbm octave, range: [0, 2], default: 0.5
 // @param lacunarity Frequency of the fbm, must be integer for tileable results, range: [1, 32]
@@ -262,13 +263,10 @@ float fbmGrid(vec2 pos, vec2 scale, int octaves, float shift, float timeShift, f
     float value = 0.0;
     for (int i = 0; i < octaves; i++) 
     {
-        // TODO: optimize via multi return value noise
         vec2 pi = p / frequency + value * warpStrength;
-        vec4 mn;;
-        mn.x = noise(pi, frequency, time, seed);
-        mn.y = noise(pi + translate.x, frequency, time, seed);
-        mn.z = noise(pi + translate.y, frequency, time, seed);
-        mn.w = noise(pi + translate.z, frequency, time, seed);
+        vec4 mn;
+        mn.xy = multiNoise(pi.xyxy + vec2(0.0, translate.x).xxyy, frequency.xyxy, time, seed);
+        mn.zw = multiNoise(pi.xyxy + translate.yyzz, frequency.xyxy, time, seed);
         mn.xy = mn.xy * mn.zw;
 
         float n = pow(abs(mn.x * mn.y), 0.25) * 2.0 - 1.0;
