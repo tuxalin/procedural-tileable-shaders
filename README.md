@@ -23,6 +23,9 @@ Collection of tileable procedural textures:
 #### Gradient Noise (Derivatives and configurable Disorder)
 ![gradient-noise](screenshots/preview_gradient_noise.png)
 
+#### Perlin Noise (Derivatives and variant)
+![perlin-noise](screenshots/preview_perlin_noise.png)
+
 ### Worley Noise
 
 #### Cellular Noise (F1 and F2), Metaballs and Cellular Noise Derivatives
@@ -34,10 +37,6 @@ Collection of tileable procedural textures:
 #### Voronoi (minimum edge distance, Cracks, random pattern and IDs)
 ![preview_voronoi](screenshots/preview_voronoi.png)
 
-### FBM
-
-### Domain warp
-
 ### Patterns
 
 #### Checkerboard (plus 45 angle), Random Lines and Dots  
@@ -48,6 +47,19 @@ Collection of tileable procedural textures:
 
 #### Tile weaves with normal (Vesica and Capsule)
 ![preview_tile_weaves](screenshots/preview_tile_weaves.png)
+
+### FBM
+
+#### Value Noise, Perlin, Grid Noise and Metaballs 
+![fbms](screenshots/preview_fbms.png)
+
+#### Sloped FBMs with derivatives (Value and Perlin)
+![fbm-sloped](screenshots/preview_fbm_sloped.png)
+
+#### Perlin FBMs (Ridge Multiply, Ridge Add, Perlin Multiply and Perlin Add)
+![fbm-perlin](screenshots/preview_fbm_perlin.png)
+
+### Domain warp
 
 ## Contributing
 
