@@ -8,10 +8,10 @@ vec2 cellularNoise(vec2 pos, vec2 scale, float jitter, float seed)
     pos *= scale;
     vec2 i = floor(pos);
     vec2 f = pos - i;
-    i = mod(i, scale) + seed;
     
     const vec3 offset = vec3(-1.0, 0.0, 1.0);
-    vec4 cells = mod(i.xyxy + offset.xxzz, scale.xyxy);
+    vec4 cells = mod(i.xyxy + offset.xxzz, scale.xyxy) + seed;
+    i = mod(i, scale) + seed;
     vec4 dx0, dy0, dx1, dy1;
     multiHash2D(vec4(cells.xy, vec2(i.x, cells.y)), vec4(cells.zyx, i.y), dx0, dy0);
     multiHash2D(vec4(cells.zwz, i.y), vec4(cells.xw, vec2(i.x, cells.w)), dx1, dy1);
@@ -52,10 +52,10 @@ vec2 cellularNoise(vec2 pos, vec2 scale, float jitter, float phase, float seed)
     pos *= scale;
     vec2 i = floor(pos);
     vec2 f = pos - i;
-    i = mod(i, scale) + seed;
     
     const vec3 offset = vec3(-1.0, 0.0, 1.0);
-    vec4 cells = mod(i.xyxy + offset.xxzz, scale.xyxy);
+    vec4 cells = mod(i.xyxy + offset.xxzz, scale.xyxy) + seed;
+    i = mod(i, scale) + seed;
     vec4 dx0, dy0, dx1, dy1;
     multiHash2D(vec4(cells.xy, vec2(i.x, cells.y)), vec4(cells.zyx, i.y), dx0, dy0);
     multiHash2D(vec4(cells.zwz, i.y), vec4(cells.xw, vec2(i.x, cells.w)), dx1, dy1);
@@ -100,10 +100,10 @@ vec2 cellularNoise(vec2 pos, vec2 scale, float jitter, float phase, uint metric,
     pos *= scale;
     vec2 i = floor(pos);
     vec2 f = pos - i;
-    i = mod(i, scale) + seed;
     
     const vec3 offset = vec3(-1.0, 0.0, 1.0);
-    vec4 cells = mod(i.xyxy + offset.xxzz, scale.xyxy);
+    vec4 cells = mod(i.xyxy + offset.xxzz, scale.xyxy) + seed;
+    i = mod(i, scale) + seed;
     vec4 dx0, dy0, dx1, dy1;
     multiHash2D(vec4(cells.xy, vec2(i.x, cells.y)), vec4(cells.zyx, i.y), dx0, dy0);
     multiHash2D(vec4(cells.zwz, i.y), vec4(cells.xw, vec2(i.x, cells.w)), dx1, dy1);
@@ -145,10 +145,10 @@ vec3 cellularNoised(vec2 pos, vec2 scale, float jitter, float seed)
     pos *= scale;
     vec2 i = floor(pos);
     vec2 f = pos - i;
-    i = mod(i, scale) + seed;
     
     const vec3 offset = vec3(-1.0, 0.0, 1.0);
-    vec4 cells = mod(i.xyxy + offset.xxzz, scale.xyxy);
+    vec4 cells = mod(i.xyxy + offset.xxzz, scale.xyxy) + seed;
+    i = mod(i, scale) + seed;
     vec4 dx0, dy0, dx1, dy1;
     multiHash2D(vec4(cells.xy, vec2(i.x, cells.y)), vec4(cells.zyx, i.y), dx0, dy0);
     multiHash2D(vec4(cells.zwz, i.y), vec4(cells.xw, vec2(i.x, cells.w)), dx1, dy1);
@@ -188,10 +188,10 @@ vec3 cellularNoised(vec2 pos, vec2 scale, float jitter, float phase, float seed)
     pos *= scale;
     vec2 i = floor(pos);
     vec2 f = pos - i;
-    i = mod(i, scale) + seed;
     
     const vec3 offset = vec3(-1.0, 0.0, 1.0);
-    vec4 cells = mod(i.xyxy + offset.xxzz, scale.xyxy);
+    vec4 cells = mod(i.xyxy + offset.xxzz, scale.xyxy) + seed;
+    i = mod(i, scale) + seed;
     vec4 dx0, dy0, dx1, dy1;
     multiHash2D(vec4(cells.xy, vec2(i.x, cells.y)), vec4(cells.zyx, i.y), dx0, dy0);
     multiHash2D(vec4(cells.zwz, i.y), vec4(cells.xw, vec2(i.x, cells.w)), dx1, dy1);
@@ -233,10 +233,10 @@ float metaballs(vec2 pos, vec2 scale, float jitter, float seed)
     pos *= scale;
     vec2 i = floor(pos);
     vec2 f = pos - i;
-    i = mod(i, scale) + seed;
     
     const vec3 offset = vec3(-1.0, 0.0, 1.0);
-    vec4 cells = mod(i.xyxy + offset.xxzz, scale.xyxy);
+    vec4 cells = mod(i.xyxy + offset.xxzz, scale.xyxy) + seed;
+    i = mod(i, scale) + seed;
     vec4 dx0, dy0, dx1, dy1;
     multiHash2D(vec4(cells.xy, vec2(i.x, cells.y)), vec4(cells.zyx, i.y), dx0, dy0);
     multiHash2D(vec4(cells.zwz, i.y), vec4(cells.xw, vec2(i.x, cells.w)), dx1, dy1);
@@ -281,10 +281,10 @@ float metaballs(vec2 pos, vec2 scale, float jitter, float phase, float seed)
     pos *= scale;
     vec2 i = floor(pos);
     vec2 f = pos - i;
-    i = mod(i, scale) + seed;
     
     const vec3 offset = vec3(-1.0, 0.0, 1.0);
-    vec4 cells = mod(i.xyxy + offset.xxzz, scale.xyxy);
+    vec4 cells = mod(i.xyxy + offset.xxzz, scale.xyxy) + seed;
+    i = mod(i, scale) + seed;
     vec4 dx0, dy0, dx1, dy1;
     multiHash2D(vec4(cells.xy, vec2(i.x, cells.y)), vec4(cells.zyx, i.y), dx0, dy0);
     multiHash2D(vec4(cells.zwz, i.y), vec4(cells.xw, vec2(i.x, cells.w)), dx1, dy1);
@@ -334,10 +334,10 @@ float metaballs(vec2 pos, vec2 scale, float jitter, float phase, uint metric, fl
     pos *= scale;
     vec2 i = floor(pos);
     vec2 f = pos - i;
-    i = mod(i, scale) + seed;
     
     const vec3 offset = vec3(-1.0, 0.0, 1.0);
-    vec4 cells = mod(i.xyxy + offset.xxzz, scale.xyxy);
+    vec4 cells = mod(i.xyxy + offset.xxzz, scale.xyxy) + seed;
+    i = mod(i, scale) + seed;
     vec4 dx0, dy0, dx1, dy1;
     multiHash2D(vec4(cells.xy, vec2(i.x, cells.y)), vec4(cells.zyx, i.y), dx0, dy0);
     multiHash2D(vec4(cells.zwz, i.y), vec4(cells.xw, vec2(i.x, cells.w)), dx1, dy1);
