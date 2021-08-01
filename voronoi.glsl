@@ -62,7 +62,7 @@ vec3 voronoi(vec2 pos, vec2 scale, float jitter, float phase, float seed)
         { 
             vec4 n = vec4(x, y, x + 1, y);
             vec4 ni = mod(i.xyxy + n, scale.xyxy) + seed;
-            vec4 cPos = betterHash2D(ni.xy, ni.zw) * jitter;
+            vec4 cPos = multiHash2D(ni.xy, ni.zw) * jitter;
             cPos = 0.5 * sin(phase + kPI2 * cPos) + 0.5;
             vec4 rPos = n + cPos - f.xyxy;
             

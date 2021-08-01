@@ -73,6 +73,10 @@ Functions: tileWeave.
 
 Functions: fbm, fbmPerlin (mode == 4u), fbmGrid and fbmMetaballs.
 
+![multi-value-fbm](screenshots/preview_fbm_multi_value.png)
+
+Functions: fbmMulti.
+
 #### Sloped FBMs with derivatives (Value and Perlin)
 ![fbm-sloped](screenshots/preview_fbm_sloped.png)
 
