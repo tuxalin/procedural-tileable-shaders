@@ -329,3 +329,31 @@ float fbmMetaballs(vec2 pos, vec2 scale, int octaves, float shift, float timeShi
     }
     return value * 0.5 + 0.5;
 }
+
+// FBM implementation using value noise which returns multiple values.
+// @param scale Number of tiles, must be  integer for tileable results, range: [2, inf]
+// @param octaves Number of octaves for the fbm, range: [1, inf]
+// @param lacunarity Frequency of the fbm, must be integer for tileable results, range: [1, 32]
+// @param phase The phase for rotating the hash, range: [0, inf], default: 0.0
+// @param seed Seed to randomize result, range: [0, inf], default: 0.0
+// @return value of the noise, range: [0, inf]
+vec4 fbmMulti(vec2 pos, vec2 scale, float lacunarity, int octaves, float phase, float seed) 
+{    
+    vec4 seeds = vec4(0.0, 1031.0, 537.0, 23.0) + seed;
+    float f = 2.0 / lacunarity;
+    
+    vec4 value = vec4(0.0);
+    float w = 1.0;
+    float acc = 0.0;
+    for (int i = 0; i < octaves; i++) 
+    {
+        vec2 ns = vec2(scale / w);
+        vec4 n;
+        n.xy = multiNoise(pos.xyxy, ns.xyxy, phase, seeds.xy);
+        n.zw = multiNoise(pos.xyxy, ns.xyxy, phase, seeds.zw);
+        value += (n * 0.5 + 0.5) * w;
+        acc += w;
+        w *= 0.5 * f;
+    }
+    return value / acc;
+}

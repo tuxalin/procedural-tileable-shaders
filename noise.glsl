@@ -175,14 +175,14 @@ vec4 noised3d(vec2 pos, vec2 scale, float time, float seed)
 // @param phase The phase for rotating the hash, range: [0, inf], default: 0.0
 // @param seed Seed to randomize result, range: [0, inf]
 // @return Value of the noise, range: [-1, 1]
-vec2 multiNoise(vec4 pos, vec4 scale, float phase, float seed) 
+vec2 multiNoise(vec4 pos, vec4 scale, float phase, vec2 seed) 
 {
     const float kPI2 = 6.2831853071;
     pos *= scale;
     vec4 i = floor(pos);
     vec4 f = pos - i;
-    vec4 i0 = mod(i.xyxy + vec2(0.0, 1.0).xxyy, scale.xyxy) + seed;
-    vec4 i1 = mod(i.zwzw + vec2(0.0, 1.0).xxyy, scale.xyxy) + seed;
+    vec4 i0 = mod(i.xyxy + vec2(0.0, 1.0).xxyy, scale.xyxy) + seed.x;
+    vec4 i1 = mod(i.zwzw + vec2(0.0, 1.0).xxyy, scale.xyxy) + seed.y;
 
     vec4 hash0 = multiHash2D(i0);
     hash0 = 0.5 * sin(phase + kPI2 * hash0) + 0.5;
@@ -281,10 +281,10 @@ vec2 randomLines(vec2 pos, vec2 scale, float count, float width, float jitter, v
     vec2 grad;
     vec3 offsets = vec3(1.0, 0.0, -1.0) / 1024.0;
     vec4 p = pos.xyxy + offsets.xyzy;
-    vec2 nv = count * (strength * multiNoise(p, scale.xyxy, phase, seed) + p.yw);
+    vec2 nv = count * (strength * multiNoise(p, scale.xyxy, phase, vec2(seed)) + p.yw);
     grad.x = nv.x - nv.y;
     p = pos.xyxy + offsets.yxyz;
-    nv = count * (strength * multiNoise(p, scale.xyxy, phase, seed) + p.yw);
+    nv = count * (strength * multiNoise(p, scale.xyxy, phase, vec2(seed)) + p.yw);
     grad.y = nv.x - nv.y;
     
     float v =  count * (strength * noise(pos, scale, phase, seed) + pos.y);
