@@ -33,7 +33,7 @@ vec2 betterHash2D(vec2 x)
 // generates a random number for each of the 4 cell corners
 vec4 betterHash2D(vec4 cell)    
 {
-    uvec4 i = uvec4(cell) + 101323u;
+    uvec4 i = uvec4(cell);
     uvec4 hash = ihash1D(ihash1D(i.xzxz) + i.yyww);
     return vec4(hash) * (1.0 / float(0xffffffffu));
 }
@@ -41,11 +41,20 @@ vec4 betterHash2D(vec4 cell)
 // generates 2 random numbers for each of the 4 cell corners
 void betterHash2D(vec4 cell, out vec4 hashX, out vec4 hashY)
 {
-    uvec4 i = uvec4(cell) + 101323u;
+    uvec4 i = uvec4(cell);
     uvec4 hash0 = ihash1D(ihash1D(i.xzxz) + i.yyww);
     uvec4 hash1 = ihash1D(hash0 ^ 1933247u);
     hashX = vec4(hash0) * (1.0 / float(0xffffffffu));
     hashY = vec4(hash1) * (1.0 / float(0xffffffffu));
+}
+
+// generates 2 random numbers for each of the 2D coordinates
+vec4 betterHash2D(vec2 coords0, vec2 coords1)
+{
+    uvec4 i = uvec4(coords0, coords1);
+    uvec4 hash = ihash1D(ihash1D(i.xz) + i.yw).xxyy;
+    hash.yw = hash.yw * 1933247u + ~hash.yw ^ 230123u;
+    return vec4(hash) * (1.0 / float(0xffffffffu));;
 }
 
 // generates 2 random numbers for each of the four 2D coordinates
