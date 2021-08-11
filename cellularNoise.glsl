@@ -373,3 +373,46 @@ float metaballs(vec2 pos, vec2 scale, float jitter, float phase, float width, fl
     float d = metaballs(pos, scale, jitter, phase, metric, seed);
     return smoothstep(width, width + smoothness, d);
 }
+
+// @param scale Number of tiles, must be  integer for tileable results, range: [2, inf]
+// @param jitter Jitter factor for the cells, if zero then it will result in a square grid, range: [0, 1], default: 1.0
+// @param phase The phase for rotating the cells, range: [0, inf], default: 0.0
+// @param metric The distance metric used, can be euclidean, manhattan, chebyshev or triangular, range: [0, 3], default: 0
+// @param seed Seed to randomize result, range: [0, inf], default: 0.0
+// @return value of the noise
+vec3 crystals(vec2 pos, vec2 scale, float jitter, float phase, uint metric)
+{
+    vec3 c0 = cellularNoise(pos, scale, jitter, phase, metric, 0.0);
+    vec3 c1 = cellularNoise(pos, scale, jitter, phase, metric, 23.0);
+    c0.x = 1.0 - c0.x;
+    c1.x = 1.0 - c1.x;
+    if (c0.x > c1.x)
+    {
+        vec3 temp = c0;
+        c0 = c1;
+        c1 = temp;
+    }
+
+    return vec3(c1.x - c0.x, c0.yz - c1.yz);
+}
+
+// @param scale Number of tiles, must be  integer for tileable results, range: [2, inf]
+// @param jitter Jitter factor for the cells, if zero then it will result in a square grid, range: [0, 1], default: 1.0
+// @param phase The phase for rotating the cells, range: [0, inf], default: 0.0
+// @param seed Seed to randomize result, range: [0, inf], default: 0.0
+// @return value of the noise, yz = derivative of the noise, range: [-1, 1]
+vec3 crystalsd(vec2 pos, vec2 scale, float jitter, float phase)
+{
+    vec3 c0 = cellularNoised(pos, scale, jitter, phase, 0.0);
+    vec3 c1 = cellularNoised(pos, scale, jitter, phase, 23.0);
+    c0.x = 1.0 - c0.x;
+    c1.x = 1.0 - c1.x;
+    if (c0.x > c1.x)
+    {
+        vec3 temp = c0;
+        c0 = c1;
+        c1 = temp;
+    }
+
+    return vec3(c1.x - c0.x, c0.yz - c1.yz);
+}
