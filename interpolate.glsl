@@ -20,6 +20,13 @@ vec4 noiseInterpolate(const in vec4 x)
     vec4 x2 = x * x;
     return x2 * x * (x * (x * 6.0 - 15.0) + 10.0); 
 }
+vec2 noiseInterpolateDu(const in float x) 
+{ 
+    float x2 = x * x;
+    float u = x2 * x * (x * (x * 6.0 - 15.0) + 10.0); 
+    float du = 30.0 * x2 * (x * (x - 2.0) + 1.0);
+    return vec2(u, du);
+}
 vec4 noiseInterpolateDu(const in vec2 x) 
 { 
     vec2 x2 = x * x;

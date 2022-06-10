@@ -10,6 +10,7 @@ Collection of tileable procedural textures:
 - voronoi (edges, cells)
 - fbms (value, perlin, voronoi and derivative)
 - domain warping (fbnm and gradient curl)
+- hexagonal grid and noise variant
 
 ## Preview
 
@@ -49,6 +50,11 @@ Functions: cellularNoise.
 
 Functions: voronoi, cracks, voronoiPattern and voronoi (tile position of the cell).
 
+#### Hexagons Noise
+![preview_hexagon_noise](screenshots/preview_hexagon_noise.png)
+
+Functions: noiseHexagons and noiseHexagonsd.
+
 ### Patterns
 
 #### Checkerboard (plus 45 angle), Random Lines and Dots  
@@ -65,6 +71,11 @@ Functions: metaballs, wavePattern, stairsPattern and crossPattern.
 ![preview_tile_weaves](screenshots/preview_tile_weaves.png)
 
 Functions: tileWeave.
+
+#### Tile hexagons (UV, position and edge distance)
+![preview_hexagon](screenshots/preview_hexagon.png)
+
+Functions: tileHexagons and tileHexagonsRadii (utility).
 
 ### FBM
 

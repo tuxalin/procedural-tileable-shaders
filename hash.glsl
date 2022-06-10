@@ -2,6 +2,7 @@
 uint ihash1D(uint q)
 {
     // hash by Hugo Elias, Integer Hash - I, 2017
+    q = q * 747796405u + 2891336453u;
     q = (q << 13u) ^ q;
     return q * (q * q * 15731u + 789221u) + 1376312589u;
 }
@@ -9,6 +10,7 @@ uint ihash1D(uint q)
 uvec2 ihash1D(uvec2 q)
 {
     // hash by Hugo Elias, Integer Hash - I, 2017
+    q = q * 747796405u + 2891336453u;
     q = (q << 13u) ^ q;
     return q * (q * q * 15731u + 789221u) + 1376312589u;
 }
@@ -16,6 +18,7 @@ uvec2 ihash1D(uvec2 q)
 uvec4 ihash1D(uvec4 q)
 {
     // hash by Hugo Elias, Integer Hash - I, 2017
+    q = q * 747796405u + 2891336453u;
     q = (q << 13u) ^ q;
     return q * (q * q * 15731u + 789221u) + 1376312589u;
 }
